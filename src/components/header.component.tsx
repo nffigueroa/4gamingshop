@@ -13,6 +13,7 @@ const HeaderStyles = makeStyles((theme: Theme) =>
       padding: '10px',
       boxSizing: 'content-box',
       position: 'relative',
+      borderBottom: '1px solid ' + theme.palette.divider,
     },
     icon: {
       position: 'absolute',
@@ -23,8 +24,6 @@ const HeaderStyles = makeStyles((theme: Theme) =>
 )
 
 const HeaderComponent = (props) => {
-  console.log(props)
-
   const classes = HeaderStyles()
   return (
     <section className={classes['container-header-com']}>

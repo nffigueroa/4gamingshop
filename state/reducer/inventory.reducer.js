@@ -1,4 +1,7 @@
-import { SET_SEARCH_RESULT } from "../actions/inventory.actions";
+import {
+  SET_INITIAL_RESULTS,
+  SET_SEARCH_RESULT,
+} from "../actions/inventory.actions";
 
 export const InventoryReducer = (state = {}, { type, payload }) => {
   switch (type) {
@@ -6,6 +9,11 @@ export const InventoryReducer = (state = {}, { type, payload }) => {
       return {
         ...state,
         searchResult: payload,
+      };
+    case SET_INITIAL_RESULTS:
+      return {
+        ...state,
+        initialResults: payload,
       };
     default:
       return state;

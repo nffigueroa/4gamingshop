@@ -5,7 +5,6 @@ import HeaderComponent from '../components/header.component'
 const HomeTemplateClasses = makeStyles((theme: Theme) =>
   createStyles({
     'home-template-container': {
-      height: '100vh',
       width: '100%',
       backgroundColor: theme.palette.background.default,
     },
@@ -15,7 +14,6 @@ const HomeTemplateClasses = makeStyles((theme: Theme) =>
 
 const HomeTemplate = (props) => {
   const { children } = props
-  console.log(props)
 
   const classes = HomeTemplateClasses()
   return (
