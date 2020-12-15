@@ -43,7 +43,7 @@ const CategoryPage = ({ dispatch, categorySelected, productsByCategory }) => {
   const [resultList, setResultList] = useState([])
   useEffect(() => {
     fetch(
-      `http://localhost:3001/gaming/search/category?categoryName=${categorySelected}`,
+      `${process.env.SEARCHPRODUCTBYCATEGORY}?categoryName=${categorySelected}`,
     )
       .then((response) => response.json())
       .then((response) => {
