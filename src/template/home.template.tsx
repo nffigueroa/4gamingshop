@@ -7,6 +7,7 @@ const HomeTemplateClasses = makeStyles((theme: Theme) =>
     'home-template-container': {
       width: '100%',
       backgroundColor: theme.palette.background.default,
+      marginTop: '100px',
     },
     'header-tmp': {},
   }),

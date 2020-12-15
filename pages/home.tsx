@@ -11,9 +11,10 @@ import {
 import React, { useEffect, useState } from 'react'
 import CardComponent from '../src/components/card.component'
 import withRedux from '../src/enhandcer/withRedux'
-import { ResponseSearch } from '../src/interfaces/Responses'
+import { ResponseCategories, ResponseSearch } from '../src/interfaces/Responses'
 import HomeTemplate from '../src/template/home.template'
 import {
+  SetCagories,
   SetInitialResults,
   SetSearchResult,
 } from '../state/actions/inventory.actions'
@@ -30,6 +31,7 @@ const HomePageStyles = makeStyles((theme: Theme) =>
     },
     'home-container': {
       height: '100vh',
+      overflow: 'scroll',
     },
     'cards-container': {
       marginTop: '30px',
@@ -69,6 +71,7 @@ const HomePageStyles = makeStyles((theme: Theme) =>
     'chip-label': {
       color: theme.palette.text.secondary,
       fontSize: '12px',
+      margin: 'auto 0',
     },
     'chip-contaier': {
       display: 'flex',
@@ -82,10 +85,12 @@ const HomePage = (props) => {
     dispatch,
     inventory,
     initialRestults,
+    categoriesDB,
   }: {
     dispatch: any
     inventory: ResponseSearch
     initialRestults: ResponseSearch
+    categoriesDB: ResponseCategories
   } = props
   const classes = HomePageStyles()
   const [inputValue, setInputValue] = useState('')
@@ -156,6 +161,7 @@ const HomePage = (props) => {
       .catch((err) =>
         setSnackBAr({ show: true, msg: 'Cannot reach the initial results' }),
       )
+    dispatch(SetCagories(categoriesDB))
   }, [])
   return (
     <section className={classes['home-container']}>
@@ -178,7 +184,7 @@ const HomePage = (props) => {
             value={inputValue}
             className={classes.input}
             id="outlined-basic"
-            label="Busca por Marca, Serie o nombre del producto"
+            label="Marca, Serie o nombre del producto"
             variant="outlined"
             onChange={(e) => handleInput(e)}
             onKeyPress={(e) => hanldeEnter(e)}
@@ -195,13 +201,13 @@ const HomePage = (props) => {
         </section>
 
         <section className={classes['container-sponsors']}>
-          {inventory && inventory.sponsors.length ? (
+          {inventory && inventory.sponsors && inventory.sponsors.length ? (
             <span className={classes['chip-label']}>Tiendas :</span>
           ) : (
             ''
           )}
           <section className={classes['chip-contaier']}>
-            {inventory && inventory.sponsors.length
+            {inventory && inventory.sponsors && inventory.sponsors.length
               ? inventory.sponsors.map((item: Seller) => (
                   <Chip
                     className={classes['chip-component']}
@@ -233,7 +239,13 @@ const HomePage = (props) => {
           {resultList && resultList.length
             ? resultList.map(
                 (
-                  { name, value, seller: { name: sellerName }, image },
+                  {
+                    name,
+                    category,
+                    value,
+                    seller: { name: sellerName },
+                    image,
+                  },
                   index: number,
                 ) => (
                   <CardComponent
@@ -242,6 +254,7 @@ const HomePage = (props) => {
                     price={value}
                     seller={sellerName}
                     img={image}
+                    category={category}
                   />
                 ),
               )
@@ -250,6 +263,15 @@ const HomePage = (props) => {
       </HomeTemplate>
     </section>
   )
+}
+
+export async function getServerSideProps({ query }) {
+  const data = await fetch('http://localhost:3001/gaming/category/list')
+    .then((response) => response.json())
+    .then(({ response: { data } }) => data)
+  return {
+    props: { categoriesDB: data },
+  }
 }
 
 export default withRedux(HomePage)

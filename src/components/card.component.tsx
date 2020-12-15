@@ -4,6 +4,7 @@ import {
   CardActions,
   CardContent,
   CardMedia,
+  Collapse,
   createStyles,
   makeStyles,
   Theme,
@@ -11,6 +12,7 @@ import {
 } from '@material-ui/core'
 import React from 'react'
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart'
+import Image from 'next/image'
 
 const CardComponentClasses = makeStyles((theme: Theme) =>
   createStyles({
@@ -19,29 +21,44 @@ const CardComponentClasses = makeStyles((theme: Theme) =>
       display: 'inline',
       position: 'relative',
       [theme.breakpoints.up(600)]: {
-        width: '30%',
+        width: '20%',
+        marginRight: '10px',
       },
     },
-    title: { fontSize: '20px' },
+    title: {
+      fontSize: '20px',
+      textOverflow: 'ellipsis',
+      overflow: 'hidden',
+      height: '60px',
+      width: 'auto',
+    },
     media: {
       height: 0,
       paddingTop: '56.25%', // 16:9
     },
     card: {
-      height: '380px',
-      maxHeight: '450px',
+      [theme.breakpoints.up(900)]: {},
       marginBottom: '20px',
     },
   }),
 )
 
-const CardComponent = ({ title, price, seller, img }) => {
+const CardComponent = ({ title, price, seller, img, category }) => {
   const classes = CardComponentClasses()
   return (
     <section className={classes['container-card']}>
       <Card className={classes.card}>
         <CardContent>
-          <CardMedia className={classes.media} image={img} title="Item" />
+          {img ? (
+            <CardMedia className={classes.media} image={img} title="Item" />
+          ) : (
+            <Image
+              src="/img/not-found.png"
+              alt="Product Image"
+              width={284}
+              height={160}
+            />
+          )}
           <Typography
             className={classes.title}
             color="textSecondary"
@@ -55,9 +72,14 @@ const CardComponent = ({ title, price, seller, img }) => {
           <Typography variant="body2" component="p">
             Vendedor: {seller}
           </Typography>
-          <CardActions style={{ position: 'absolute', bottom: '40px' }}>
+          <Typography variant="body2" component="p">
+            Categoria: {category}
+          </Typography>
+
+          {/* <CardActions style={{ position: 'absolute', bottom: '40px' }}>
             <ShoppingCartIcon />
           </CardActions>
+          */}
         </CardContent>
       </Card>
     </section>
