@@ -124,7 +124,7 @@ const HomePage = (props) => {
     if (inputValue && inputValue.length < 2) {
       return
     }
-    fetch(`http://localhost:3001/gaming/search?name=${inputValue}`)
+    fetch(`${process.env.NEXT_PUBLIC_SEARCHENDPOINT}?name=${inputValue}`)
       .then((response) => response.json())
       .then(({ response }) => {
         response.status === 404 &&
@@ -151,9 +151,11 @@ const HomePage = (props) => {
   }, [inventory?.response])
   useEffect(() => {
     setOpenBackDrop(true)
-    fetch('http://localhost:3001/gaming/search/initial')
+    fetch(process.env.NEXT_PUBLIC_SEARCHINITIALENDPOINT)
       .then((response) => response.json())
       .then(({ response }) => {
+        console.log(response)
+
         dispatch(SetSearchResult(response))
         dispatch(SetInitialResults(response))
         setOpenBackDrop(false)
@@ -266,9 +268,10 @@ const HomePage = (props) => {
 }
 
 export async function getServerSideProps({ query }) {
-  const data = await fetch('http://localhost:3001/gaming/category/list')
+  const data = await fetch(process.env.CATEGORYLIST)
     .then((response) => response.json())
     .then(({ response: { data } }) => data)
+  console.log(data)
   return {
     props: { categoriesDB: data },
   }

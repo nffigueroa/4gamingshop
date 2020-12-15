@@ -69,6 +69,8 @@ const HeaderComponent = ({ listCategories, dispatch, menuOpened }) => {
   useEffect(() => {
     dispatch(SetMenuOpened({ left: false }))
   }, [])
+  console.log(listCategories)
+
   return (
     <section className={classes['container-header-com']}>
       {menuOpened ? (
@@ -79,7 +81,7 @@ const HeaderComponent = ({ listCategories, dispatch, menuOpened }) => {
             onClose={toggleDrawer('left', false)}
             onOpen={toggleDrawer('left', true)}
           >
-            {listCategories?.categories.length ? (
+            {listCategories && listCategories?.categories.length ? (
               <List>
                 {listCategories?.categories.map((text, index) => (
                   <ListItem
