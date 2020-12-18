@@ -3,7 +3,7 @@ export default function Home(props) {
   return <HomePage {...props} />;
 }
 
-export async function getServerSideProps({ query }) {
+export async function getServerSideProps() {
   const data = await fetch(process.env.CATEGORYLIST)
     .then((response) => response.json())
     .then(({ response: { data } }) => data);
