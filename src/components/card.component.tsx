@@ -67,7 +67,7 @@ const CardComponent = ({ title, price, seller, img, category }) => {
             {title}
           </Typography>
           <Typography variant="h5" component="h2">
-            Precio: {price}
+            Precio: $ {new Intl.NumberFormat().format(price)}
           </Typography>
           <Typography variant="body2" component="p">
             Vendedor: {seller}

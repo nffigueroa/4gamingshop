@@ -41,6 +41,9 @@ const HeaderStyles = makeStyles((theme: Theme) =>
       left: '10px',
       top: '15px',
     },
+    img: {
+      cursor: 'pointer',
+    },
   }),
 )
 
@@ -116,6 +119,7 @@ const HeaderComponent = ({ listCategories, dispatch, menuOpened }) => {
         alt="Logo"
         width={80}
         height={30}
+        className={classes.img}
       />
     </section>
   )

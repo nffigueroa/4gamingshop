@@ -1,4 +1,10 @@
-import { Chip, createStyles, makeStyles } from '@material-ui/core'
+import {
+  Backdrop,
+  Chip,
+  CircularProgress,
+  createStyles,
+  makeStyles,
+} from '@material-ui/core'
 import React, { useEffect, useState } from 'react'
 import CardComponent from '../src/components/card.component'
 import withRedux from '../src/enhandcer/withRedux'
@@ -13,6 +19,10 @@ const CategoryPageStyles = makeStyles((theme) =>
       body: {
         backgroundColor: theme.palette.background.default,
       },
+    },
+    backdrop: {
+      zIndex: theme.zIndex.drawer + 1,
+      color: '#fff',
     },
     'cards-container': {
       marginTop: '30px',
@@ -41,14 +51,20 @@ const CategoryPageStyles = makeStyles((theme) =>
 const CategoryPage = ({ dispatch, categorySelected, productsByCategory }) => {
   const classes = CategoryPageStyles()
   const [resultList, setResultList] = useState([])
+  const [openBackdrop, setOpenBackDrop] = useState(false)
+  const handleClose = () => {
+    setOpenBackDrop(false)
+  }
   useEffect(() => {
+    setOpenBackDrop(true)
     fetch(
-      `${process.env.SEARCHPRODUCTBYCATEGORY}?categoryName=${categorySelected}`,
+      `${process.env.NEXT_PUBLIC_SEARCHPRODUCTBYCATEGORY}?categoryName=${categorySelected}`,
     )
       .then((response) => response.json())
       .then((response) => {
         dispatch(SetProductsByCategory(response))
         setResultList(response.data)
+        setOpenBackDrop(false)
       })
   }, [categorySelected])
   const handleFilterByStore = (storeClicked?: Seller) => {
@@ -63,6 +79,14 @@ const CategoryPage = ({ dispatch, categorySelected, productsByCategory }) => {
   }
   return (
     <section>
+      <Backdrop
+        className={classes.backdrop}
+        open={openBackdrop}
+        onClick={handleClose}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+      <HomeTemplate></HomeTemplate>
       <HomeTemplate>
         <section className={classes['container-sponsors']}>
           {productsByCategory &&
