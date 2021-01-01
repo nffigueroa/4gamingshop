@@ -134,6 +134,7 @@ const CategoryPage = ({ dispatch, categorySelected, productsByCategory }) => {
                     seller: { name: sellerName },
                     image,
                     category,
+                    url,
                   },
                   index: number,
                 ) => (
@@ -144,6 +145,7 @@ const CategoryPage = ({ dispatch, categorySelected, productsByCategory }) => {
                     seller={sellerName}
                     img={image}
                     category={category}
+                    url={url}
                   />
                 ),
               )

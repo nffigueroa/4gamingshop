@@ -247,6 +247,7 @@ const HomePage = (props) => {
                     value,
                     seller: { name: sellerName },
                     image,
+                    url,
                   },
                   index: number,
                 ) => (
@@ -257,6 +258,7 @@ const HomePage = (props) => {
                     seller={sellerName}
                     img={image}
                     category={category}
+                    url={url}
                   />
                 ),
               )
