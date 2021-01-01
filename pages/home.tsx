@@ -151,7 +151,7 @@ const HomePage = (props) => {
   }, [inventory?.response])
   useEffect(() => {
     setOpenBackDrop(true)
-    fetch(process.env.NEXT_PUBLIC_SEARCHINITIALENDPOINT)
+    fetch(process.env.NEXT_PUBLIC_SEARCHINITIALENDPOINT, { mode: 'cors' })
       .then((response) => response.json())
       .then(({ response }) => {
         console.log(response)
