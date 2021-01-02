@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Card,
   CardActions,
@@ -9,9 +10,10 @@ import {
   makeStyles,
   Theme,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from '@material-ui/core'
-import React from 'react'
-import ShoppingCartIcon from '@material-ui/icons/ShoppingCart'
+import React, { useState } from 'react'
 import Image from 'next/image'
 
 const CardComponentClasses = makeStyles((theme: Theme) =>
@@ -43,11 +45,42 @@ const CardComponentClasses = makeStyles((theme: Theme) =>
   }),
 )
 
-const CardComponent = ({ title, price, seller, img, category }) => {
+const RedirectBottomStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    'container-redirect': {
+      textAlign: 'center',
+      cursor: 'pointer',
+      fontWeight: 'bold',
+    },
+  }),
+)
+
+const RedirectBottom = ({ url }) => {
+  const classes = RedirectBottomStyles()
+  return (
+    <section
+      className={classes['container-redirect']}
+      onClick={() => (url ? (window.location.href = url) : '')}
+    >
+      <Box bgcolor="success.main" color="primary.contrastText" p={2}>
+        VER EN TIENDA
+      </Box>
+    </section>
+  )
+}
+
+const CardComponent = ({ title, price, seller, img, category, url }) => {
   const classes = CardComponentClasses()
+  const [hover, setHover] = useState(false)
+  const theme = useTheme()
+  const matches = useMediaQuery(theme.breakpoints.up('md'))
   return (
     <section className={classes['container-card']}>
-      <Card className={classes.card}>
+      <Card
+        className={classes.card}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+      >
         <CardContent>
           {img ? (
             <CardMedia className={classes.media} image={img} title="Item" />
@@ -81,6 +114,9 @@ const CardComponent = ({ title, price, seller, img, category }) => {
           </CardActions>
           */}
         </CardContent>
+        <Collapse in={(!!url && hover) || !matches}>
+          <RedirectBottom url={url} />
+        </Collapse>
       </Card>
     </section>
   )

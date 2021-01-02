@@ -8,6 +8,8 @@ import {
   makeStyles,
   SwipeableDrawer,
   Theme,
+  useMediaQuery,
+  useTheme,
 } from '@material-ui/core'
 import { useRouter } from 'next/router'
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos'
@@ -50,7 +52,8 @@ const HeaderStyles = makeStyles((theme: Theme) =>
 const HeaderComponent = ({ listCategories, dispatch, menuOpened }) => {
   const router = useRouter()
   const classes = HeaderStyles()
-
+  const theme = useTheme()
+  const matches = useMediaQuery(theme.breakpoints.up('md'))
   const toggleDrawer = (anchor, open) => (event) => {
     if (
       event &&
@@ -72,7 +75,6 @@ const HeaderComponent = ({ listCategories, dispatch, menuOpened }) => {
   useEffect(() => {
     dispatch(SetMenuOpened({ left: false }))
   }, [])
-  console.log(listCategories)
 
   return (
     <section className={classes['container-header-com']}>
@@ -107,12 +109,16 @@ const HeaderComponent = ({ listCategories, dispatch, menuOpened }) => {
       ) : (
         ''
       )}
+      {!matches ? (
+        <MenuIcon
+          onClick={toggleDrawer('left', true)}
+          className={classes['icon']}
+          style={{ fontSize: '50px', color: 'white' }}
+        />
+      ) : (
+        ''
+      )}
 
-      <MenuIcon
-        onClick={toggleDrawer('left', true)}
-        className={classes['icon']}
-        style={{ fontSize: '50px', color: 'white' }}
-      />
       <Image
         onClick={redirectToHome}
         src="/img/Logo4Gamer.png"

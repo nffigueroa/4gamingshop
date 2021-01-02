@@ -21,6 +21,8 @@ import {
 import ContactSupportIcon from '@material-ui/icons/ContactSupport'
 import { ItemProduct, Seller } from '../src/interfaces/ItemProduct'
 import Snackbar from '@material-ui/core/Snackbar'
+import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward'
+import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward'
 
 const HomePageStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -58,12 +60,18 @@ const HomePageStyles = makeStyles((theme: Theme) =>
       width: '100%',
       margin: '50px 10px 10px 10px',
       display: 'flex',
+      [theme.breakpoints.up('md')]: {
+        marginTop: 0,
+      },
     },
     'container-sponsors': {
       display: 'flex',
       flexWrap: 'wrap',
       margin: '20px 10px auto 10px',
       width: '100%',
+      [theme.breakpoints.up('md')]: {
+        marginLeft: '2%',
+      },
     },
     'chip-component': {
       margin: '5px 5px',
@@ -73,9 +81,26 @@ const HomePageStyles = makeStyles((theme: Theme) =>
       fontSize: '12px',
       margin: 'auto 0',
     },
+    'chip-filter': {
+      color: theme.palette.text.secondary,
+      fontSize: '12px',
+      margin: 'auto 0',
+      display: 'block',
+    },
     'chip-contaier': {
       display: 'flex',
       flexWrap: 'wrap',
+    },
+    filter: {
+      display: 'flex',
+      [theme.breakpoints.up('md')]: {
+        marginLeft: '2%',
+      },
+    },
+    'filter-icons': {
+      margin: '0 0 0 5px',
+      color: theme.palette.text.primary,
+      fontSize: '10px',
     },
   }),
 )
@@ -96,6 +121,7 @@ const HomePage = (props) => {
   const [inputValue, setInputValue] = useState('')
   const [openBackdrop, setOpenBackDrop] = useState(false)
   const [resultList, setResultList] = useState([])
+  const [priceFilter, setPriceFilter] = useState(true)
   const [snackBAr, setSnackBAr] = useState({ show: false, msg: '' })
   const handleClose = () => {
     setOpenBackDrop(false)
@@ -104,10 +130,26 @@ const HomePage = (props) => {
     setSnackBAr({ show: false, msg: '' })
   }
   const sortByPrice = (arr: Array<ItemProduct>) => {
-    const sortedList = arr.sort(
-      (a: ItemProduct, b: ItemProduct) => Number(a.value) - Number(b.value),
+    const sortedList = arr.sort((a: ItemProduct, b: ItemProduct) =>
+      !priceFilter
+        ? Number(a.value) - Number(b.value)
+        : Number(b.value) - Number(a.value),
     )
     setResultList(sortedList)
+  }
+  const initialResults = () => {
+    setOpenBackDrop(true)
+    fetch(process.env.NEXT_PUBLIC_SEARCHINITIALENDPOINT)
+      .then((response) => response.json())
+      .then(({ response }) => {
+        dispatch(SetSearchResult(response))
+        dispatch(SetInitialResults(response))
+        setOpenBackDrop(false)
+      })
+      .catch((err) =>
+        setSnackBAr({ show: true, msg: 'Cannot reach the initial results' }),
+      )
+    dispatch(SetCagories(categoriesDB))
   }
   const handleInput = ({ target: { value } }) => setInputValue(value)
   const handleFilterByStore = (storeClicked?: Seller) => {
@@ -122,7 +164,7 @@ const HomePage = (props) => {
   }
   const amendQuery = () => {
     if (inputValue && inputValue.length < 2) {
-      return
+      initialResults()
     }
     fetch(`${process.env.NEXT_PUBLIC_SEARCHENDPOINT}?name=${inputValue}`)
       .then((response) => response.json())
@@ -143,6 +185,7 @@ const HomePage = (props) => {
       amendQuery()
     }
   }
+
   useEffect(() => {
     if (!inventory) {
       return
@@ -150,21 +193,11 @@ const HomePage = (props) => {
     sortByPrice(inventory?.response)
   }, [inventory?.response])
   useEffect(() => {
-    setOpenBackDrop(true)
-    fetch(process.env.NEXT_PUBLIC_SEARCHINITIALENDPOINT)
-      .then((response) => response.json())
-      .then(({ response }) => {
-        console.log(response)
-
-        dispatch(SetSearchResult(response))
-        dispatch(SetInitialResults(response))
-        setOpenBackDrop(false)
-      })
-      .catch((err) =>
-        setSnackBAr({ show: true, msg: 'Cannot reach the initial results' }),
-      )
-    dispatch(SetCagories(categoriesDB))
+    if (!!initialRestults) {
+      initialResults()
+    }
   }, [])
+
   return (
     <section className={classes['home-container']}>
       <Snackbar
@@ -236,6 +269,37 @@ const HomePage = (props) => {
             )}
           </section>
         </section>
+        <section className={classes.filter}>
+          {inventory && inventory.sponsors && inventory.sponsors.length ? (
+            <span className={classes['chip-filter']}>Filtrar Precio :</span>
+          ) : (
+            ''
+          )}
+          <section
+            className={classes['filter-icons']}
+            style={{ border: priceFilter ? '2px dotted black' : '' }}
+          >
+            <ArrowDownwardIcon
+              onClick={() => {
+                setPriceFilter(true)
+                sortByPrice(resultList)
+              }}
+              fontSize="small"
+            />
+          </section>
+          <section
+            className={classes['filter-icons']}
+            style={{ border: !priceFilter ? '2px dotted black' : '' }}
+          >
+            <ArrowUpwardIcon
+              onClick={() => {
+                setPriceFilter(false)
+                sortByPrice(resultList)
+              }}
+              fontSize="small"
+            />
+          </section>
+        </section>
 
         <section className={classes['cards-container']}>
           {resultList && resultList.length
@@ -247,6 +311,7 @@ const HomePage = (props) => {
                     value,
                     seller: { name: sellerName },
                     image,
+                    url,
                   },
                   index: number,
                 ) => (
@@ -257,6 +322,7 @@ const HomePage = (props) => {
                     seller={sellerName}
                     img={image}
                     category={category}
+                    url={url}
                   />
                 ),
               )
@@ -271,7 +337,6 @@ export async function getServerSideProps({ query }) {
   const data = await fetch(process.env.CATEGORYLIST)
     .then((response) => response.json())
     .then(({ response: { data } }) => data)
-  console.log(data)
   return {
     props: { categoriesDB: data },
   }
