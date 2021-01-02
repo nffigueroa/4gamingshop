@@ -10,9 +10,10 @@ import {
   makeStyles,
   Theme,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from '@material-ui/core'
 import React, { useState } from 'react'
-import ShoppingCartIcon from '@material-ui/icons/ShoppingCart'
 import Image from 'next/image'
 
 const CardComponentClasses = makeStyles((theme: Theme) =>
@@ -54,10 +55,13 @@ const RedirectBottomStyles = makeStyles((theme: Theme) =>
   }),
 )
 
-const RedirectBottom = () => {
+const RedirectBottom = ({ url }) => {
   const classes = RedirectBottomStyles()
   return (
-    <section className={classes['container-redirect']}>
+    <section
+      className={classes['container-redirect']}
+      onClick={() => (url ? (window.location.href = url) : '')}
+    >
       <Box bgcolor="success.main" color="primary.contrastText" p={2}>
         VER EN TIENDA
       </Box>
@@ -68,11 +72,12 @@ const RedirectBottom = () => {
 const CardComponent = ({ title, price, seller, img, category, url }) => {
   const classes = CardComponentClasses()
   const [hover, setHover] = useState(false)
+  const theme = useTheme()
+  const matches = useMediaQuery(theme.breakpoints.up('md'))
   return (
     <section className={classes['container-card']}>
       <Card
         className={classes.card}
-        onClick={() => (url ? (window.location.href = url) : '')}
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
       >
@@ -109,8 +114,8 @@ const CardComponent = ({ title, price, seller, img, category, url }) => {
           </CardActions>
           */}
         </CardContent>
-        <Collapse in={!!url && hover}>
-          <RedirectBottom />
+        <Collapse in={(!!url && hover) || !matches}>
+          <RedirectBottom url={url} />
         </Collapse>
       </Card>
     </section>
