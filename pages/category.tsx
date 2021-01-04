@@ -18,8 +18,9 @@ import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward'
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward'
 import { GraphQLClient } from 'graphql-request'
 import useSWR from 'swr'
-import { useRouter } from 'next/router'
+import { Router, useRouter } from 'next/router'
 import { gql, useLazyQuery, useQuery } from '@apollo/client'
+import { SetPageLoading } from '../state/actions/navigtation.actions'
 
 const CategoryPageStyles = makeStyles((theme) =>
   createStyles({
