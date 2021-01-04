@@ -239,7 +239,7 @@ const HomePage = (props) => {
                 ))
               : ''}
 
-            {inventory && inventory.sponsors.length ? (
+            {inventory && inventory.sponsors && inventory.sponsors.length ? (
               <Chip
                 className={classes['chip-component']}
                 label={'Todos'}
@@ -295,7 +295,7 @@ const HomePage = (props) => {
                     value,
                     seller: { name: sellerName },
                     image,
-                    urlRefer,
+                    url,
                   },
                   index: number,
                 ) => (
@@ -306,7 +306,7 @@ const HomePage = (props) => {
                     seller={sellerName}
                     img={image}
                     category={category}
-                    url={urlRefer}
+                    url={url}
                   />
                 ),
               )

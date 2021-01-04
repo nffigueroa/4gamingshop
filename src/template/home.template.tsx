@@ -39,6 +39,9 @@ const HomeTemplate = (props) => {
   const [listMenu, setListMenu] = useState([])
   const router = useRouter()
   useEffect(() => {
+    if (!listCategories) {
+      return
+    }
     setListMenu(
       listCategories.map((item: string) => {
         return {
@@ -52,7 +55,7 @@ const HomeTemplate = (props) => {
         }
       }),
     )
-  }, [])
+  }, [listCategories])
   const classes = HomeTemplateClasses()
   return (
     <section className={classes['home-template-container']}>
