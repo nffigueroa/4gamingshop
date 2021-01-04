@@ -33,24 +33,20 @@ const HomeTemplateClasses = makeStyles((theme: Theme) =>
 )
 
 const HomeTemplate = (props) => {
-  const {
-    children,
-    listCategories: { categories } = { categories: [] },
-    dispatch,
-  } = props
+  const { children, listCategories, dispatch } = props
   const theme = useTheme()
   const matches = useMediaQuery(theme.breakpoints.up('md'))
   const [listMenu, setListMenu] = useState([])
   const router = useRouter()
   useEffect(() => {
     setListMenu(
-      categories.map((item: string) => {
+      listCategories.map((item: string) => {
         return {
           txt: item,
           func: () => {
             dispatch(SetCategorySelected(item))
             setTimeout(() => {
-              router.push('/category')
+              router.push({ pathname: '/category', query: { filterby: item } })
             })
           },
         }

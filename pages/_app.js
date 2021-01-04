@@ -7,6 +7,12 @@ import {
   useMediaQuery,
 } from "@material-ui/core";
 import { useMemo } from "react";
+import {
+  ApolloClient,
+  ApolloProvider,
+  HttpLink,
+  InMemoryCache,
+} from "@apollo/client";
 
 const darkTheme = createMuiTheme({
   palette: {
@@ -16,7 +22,6 @@ const darkTheme = createMuiTheme({
 
 function MyApp({ Component, pageProps, reduxStore }) {
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
-
   const theme = useMemo(
     () =>
       createMuiTheme({
@@ -26,12 +31,19 @@ function MyApp({ Component, pageProps, reduxStore }) {
       }),
     [prefersDarkMode]
   );
-
+  const client = new ApolloClient({
+    cache: new InMemoryCache(),
+    link: new HttpLink({
+      uri: "http://localhost:3001/graphql",
+    }),
+  });
   return (
     <ThemeProvider theme={theme}>
-      <Provider store={reduxStore}>
-        <Component {...pageProps} />
-      </Provider>
+      <ApolloProvider client={client}>
+        <Provider store={reduxStore}>
+          <Component {...pageProps} />
+        </Provider>
+      </ApolloProvider>
     </ThemeProvider>
   );
 }

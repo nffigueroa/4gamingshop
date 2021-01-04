@@ -70,7 +70,7 @@ const HeaderComponent = ({ listCategories, dispatch, menuOpened }) => {
 
     dispatch(SetMenuOpened({ left: !menuOpened.left }))
 
-    router.push('/category')
+    router.push({ pathname: '/category', query: { filterby: category } })
   }
   useEffect(() => {
     dispatch(SetMenuOpened({ left: false }))
@@ -86,9 +86,9 @@ const HeaderComponent = ({ listCategories, dispatch, menuOpened }) => {
             onClose={toggleDrawer('left', false)}
             onOpen={toggleDrawer('left', true)}
           >
-            {listCategories && listCategories?.categories.length ? (
+            {listCategories && listCategories.length ? (
               <List>
-                {listCategories?.categories.map((text, index) => (
+                {listCategories.map((text, index) => (
                   <ListItem
                     button
                     key={text}
