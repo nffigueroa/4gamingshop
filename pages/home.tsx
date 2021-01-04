@@ -23,6 +23,7 @@ import { ItemProduct, Seller } from '../src/interfaces/ItemProduct'
 import Snackbar from '@material-ui/core/Snackbar'
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward'
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward'
+import { request, gql, GraphQLClient } from 'graphql-request'
 
 const HomePageStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -109,14 +110,11 @@ const HomePage = (props) => {
   const {
     dispatch,
     inventory,
-    initialRestults,
     categoriesDB,
-  }: {
-    dispatch: any
-    inventory: ResponseSearch
-    initialRestults: ResponseSearch
-    categoriesDB: ResponseCategories
+    initialRestults,
+    initResults,
   } = props
+
   const classes = HomePageStyles()
   const [inputValue, setInputValue] = useState('')
   const [openBackdrop, setOpenBackDrop] = useState(false)
@@ -137,20 +135,6 @@ const HomePage = (props) => {
     )
     setResultList(sortedList)
   }
-  const initialResults = () => {
-    setOpenBackDrop(true)
-    fetch(process.env.NEXT_PUBLIC_SEARCHINITIALENDPOINT)
-      .then((response) => response.json())
-      .then(({ response }) => {
-        dispatch(SetSearchResult(response))
-        dispatch(SetInitialResults(response))
-        setOpenBackDrop(false)
-      })
-      .catch((err) =>
-        setSnackBAr({ show: true, msg: 'Cannot reach the initial results' }),
-      )
-    dispatch(SetCagories(categoriesDB))
-  }
   const handleInput = ({ target: { value } }) => setInputValue(value)
   const handleFilterByStore = (storeClicked?: Seller) => {
     if (!storeClicked) {
@@ -164,7 +148,7 @@ const HomePage = (props) => {
   }
   const amendQuery = () => {
     if (inputValue && inputValue.length < 2) {
-      initialResults()
+      return
     }
     fetch(`${process.env.NEXT_PUBLIC_SEARCHENDPOINT}?name=${inputValue}`)
       .then((response) => response.json())
@@ -192,12 +176,12 @@ const HomePage = (props) => {
     }
     sortByPrice(inventory?.response)
   }, [inventory?.response])
-  useEffect(() => {
-    if (!!initialRestults) {
-      initialResults()
-    }
-  }, [])
 
+  useEffect(() => {
+    dispatch(SetSearchResult(initResults))
+    dispatch(SetInitialResults(initResults))
+    dispatch(SetCagories(categoriesDB))
+  }, [])
   return (
     <section className={classes['home-container']}>
       <Snackbar
@@ -255,7 +239,7 @@ const HomePage = (props) => {
                 ))
               : ''}
 
-            {inventory && inventory.sponsors.length ? (
+            {inventory && inventory.sponsors && inventory.sponsors.length ? (
               <Chip
                 className={classes['chip-component']}
                 label={'Todos'}
@@ -334,11 +318,35 @@ const HomePage = (props) => {
 }
 
 export async function getServerSideProps({ query }) {
-  const data = await fetch(process.env.CATEGORYLIST)
-    .then((response) => response.json())
-    .then(({ response: { data } }) => data)
+  const gqlClient = new GraphQLClient(process.env.GRAPHQL_ENDPOINT)
+  const {
+    categoriesList,
+    initialResults: { response, sponsors },
+  } = await gqlClient.request(`query {
+    initialResults {
+      response {
+        name
+        value
+        seller {
+          key
+          name
+        }
+        category
+        image
+        urlRefer
+      }
+      sponsors {
+        key
+        name
+      }
+    }
+    categoriesList
+  }`)
   return {
-    props: { categoriesDB: data },
+    props: {
+      categoriesDB: categoriesList,
+      initResults: { response, sponsors },
+    },
   }
 }
 

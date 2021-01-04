@@ -1,5 +1,6 @@
 export const CATEGORY_SELECTED = "CATEGORY_SELECTED";
 export const MENU_OPENED = "MENU_OPENED";
+export const PAGE_LOADING = "PAGE_LOADING";
 
 export const SetCategorySelected = (payload) => {
   return {
@@ -10,6 +11,12 @@ export const SetCategorySelected = (payload) => {
 export const SetMenuOpened = (payload) => {
   return {
     type: MENU_OPENED,
+    payload,
+  };
+};
+export const SetPageLoading = (payload) => {
+  return {
+    type: PAGE_LOADING,
     payload,
   };
 };

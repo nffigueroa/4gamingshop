@@ -16,6 +16,11 @@ import { SetProductsByCategory } from '../state/actions/inventory.actions'
 import ContactSupportIcon from '@material-ui/icons/ContactSupport'
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward'
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward'
+import { GraphQLClient } from 'graphql-request'
+import useSWR from 'swr'
+import { Router, useRouter } from 'next/router'
+import { gql, useLazyQuery, useQuery } from '@apollo/client'
+import { SetPageLoading } from '../state/actions/navigtation.actions'
 
 const CategoryPageStyles = makeStyles((theme) =>
   createStyles({
@@ -90,7 +95,12 @@ const CategoryPageStyles = makeStyles((theme) =>
   }),
 )
 
-const CategoryPage = ({ dispatch, categorySelected, productsByCategory }) => {
+const CategoryPage = ({
+  dispatch,
+  categorySelected,
+  productsByCategory,
+  products,
+}) => {
   const classes = CategoryPageStyles()
   const [resultList, setResultList] = useState([])
   const [openBackdrop, setOpenBackDrop] = useState(false)
@@ -101,23 +111,14 @@ const CategoryPage = ({ dispatch, categorySelected, productsByCategory }) => {
   const handleClose = () => {
     setOpenBackDrop(false)
   }
-  const triggerSearchByCategory = () => {
-    setOpenBackDrop(true)
-    fetch(
-      `${process.env.NEXT_PUBLIC_SEARCHPRODUCTBYCATEGORY}?categoryName=${categorySelected}`,
-    )
-      .then((response) => response.json())
-      .then((response) => {
-        dispatch(SetProductsByCategory(response))
-        setResultList(response.data)
-        setResultsFiltered(response.data)
-        setOpenBackDrop(false)
-      })
-  }
+
   useEffect(() => sortByPrice(resultsFiltered), [resultsFiltered])
+
   useEffect(() => {
-    triggerSearchByCategory()
-  }, [categorySelected])
+    dispatch(SetProductsByCategory(products))
+    setResultList(products.data)
+    setResultsFiltered(products.data)
+  }, [products])
   const handleFilterByStore = (storeClicked?: Seller) => {
     if (!storeClicked) {
       setResultsFiltered(productsByCategory.data)
@@ -281,6 +282,35 @@ const CategoryPage = ({ dispatch, categorySelected, productsByCategory }) => {
       </HomeTemplate>
     </section>
   )
+}
+export async function getServerSideProps({ query }) {
+  const gqlClient = new GraphQLClient(process.env.GRAPHQL_ENDPOINT)
+  const {
+    searchProductByCategory: { response, sponsors },
+  } = await gqlClient.request(`query {
+    searchProductByCategory(categoryName: "${query.filterby}") {
+      response {
+        name
+        value
+        seller {
+          key
+          name
+        }
+        category
+        image
+        urlRefer
+      }
+      sponsors {
+        key
+        name
+      }
+    }
+  }`)
+  return {
+    props: {
+      products: { data: response, sponsors },
+    },
+  }
 }
 
 export default withRedux(CategoryPage)

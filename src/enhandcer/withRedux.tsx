@@ -14,6 +14,7 @@ export interface StateInterface {
     menuOpened: {
       left: boolean
     }
+    page_loading: boolean
   }
 }
 
@@ -28,6 +29,7 @@ const withRedux = (Component: Function) => {
     categorySelected: state.navigation.categorySelected,
     productsByCategory: state.inventory.productsByCategory,
     menuOpened: state.navigation.menuOpened,
+    pageLoading: state.navigation.page_loading,
   })
   return connect(mapStateToProps)(WithRedux)
 }

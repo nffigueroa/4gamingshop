@@ -1,13 +1,18 @@
 import {
+  Backdrop,
+  CircularProgress,
   createStyles,
   makeStyles,
   Theme,
   useMediaQuery,
   useTheme,
 } from '@material-ui/core'
-import { useRouter } from 'next/router'
+import { Router, useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
-import { SetCategorySelected } from '../../state/actions/navigtation.actions'
+import {
+  SetCategorySelected,
+  SetPageLoading,
+} from '../../state/actions/navigtation.actions'
 import HeaderComponent from '../components/header.component'
 import { MenuComponent, MenuItem } from '../components/menu.component'
 import withRedux from '../enhandcer/withRedux'
@@ -29,37 +34,47 @@ const HomeTemplateClasses = makeStyles((theme: Theme) =>
     body: {
       display: 'flex',
     },
+    backdrop: {
+      zIndex: theme.zIndex.drawer + 1,
+      color: '#fff',
+    },
   }),
 )
 
 const HomeTemplate = (props) => {
-  const {
-    children,
-    listCategories: { categories } = { categories: [] },
-    dispatch,
-  } = props
+  const { children, listCategories, dispatch, pageLoading = false } = props
   const theme = useTheme()
+  const [openBackdrop, setOpenBackDrop] = useState(false)
   const matches = useMediaQuery(theme.breakpoints.up('md'))
   const [listMenu, setListMenu] = useState([])
   const router = useRouter()
   useEffect(() => {
+    if (!listCategories) {
+      return
+    }
     setListMenu(
-      categories.map((item: string) => {
+      listCategories.map((item: string) => {
         return {
           txt: item,
           func: () => {
             dispatch(SetCategorySelected(item))
-            setTimeout(() => {
-              router.push('/category')
-            })
+            Router.events.on('routeChangeStart', () => setOpenBackDrop(true))
+            Router.events.on('routeChangeComplete', () =>
+              setOpenBackDrop(false),
+            )
+
+            router.push({ pathname: '/category', query: { filterby: item } })
           },
         }
       }),
     )
-  }, [])
+  }, [listCategories])
   const classes = HomeTemplateClasses()
   return (
     <section className={classes['home-template-container']}>
+      <Backdrop className={classes.backdrop} open={openBackdrop}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <header className={classes['header-tmp']}>
         <HeaderComponent />
       </header>
