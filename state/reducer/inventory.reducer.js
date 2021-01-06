@@ -1,8 +1,11 @@
 import {
   SET_CATEGORIES,
+  SET_FILTER_BY_PRICE,
   SET_INITIAL_RESULTS,
   SET_PRODUCTS_BY_CATEGORY,
   SET_SEARCH_RESULT,
+  SET_FILTER_BY_STORE,
+  SET_SPONSORS,
 } from "../actions/inventory.actions";
 
 export const InventoryReducer = (state = {}, { type, payload }) => {
@@ -26,6 +29,21 @@ export const InventoryReducer = (state = {}, { type, payload }) => {
       return {
         ...state,
         productsByCategory: payload,
+      };
+    case SET_FILTER_BY_PRICE:
+      return {
+        ...state,
+        filterByPrice: payload,
+      };
+    case SET_FILTER_BY_STORE:
+      return {
+        ...state,
+        filterByStore: payload,
+      };
+    case SET_SPONSORS:
+      return {
+        ...state,
+        sponsors: payload,
       };
     default:
       return state;

@@ -27,6 +27,9 @@ function MyApp({ Component, pageProps, reduxStore }) {
       createMuiTheme({
         palette: {
           type: "dark",
+          background: {
+            default: "#0F3051",
+          },
         },
       }),
     [prefersDarkMode]

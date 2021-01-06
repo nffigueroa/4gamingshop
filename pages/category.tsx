@@ -12,7 +12,10 @@ import CardComponent from '../src/components/card.component'
 import withRedux from '../src/enhandcer/withRedux'
 import { ItemProduct, Seller } from '../src/interfaces/ItemProduct'
 import HomeTemplate from '../src/template/home.template'
-import { SetProductsByCategory } from '../state/actions/inventory.actions'
+import {
+  SetProductsByCategory,
+  SetSponsors,
+} from '../state/actions/inventory.actions'
 import ContactSupportIcon from '@material-ui/icons/ContactSupport'
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward'
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward'
@@ -39,6 +42,7 @@ const CategoryPageStyles = makeStyles((theme) =>
       flexWrap: 'wrap',
       width: '100%',
       justifyContent: 'space-around',
+      marginLeft: '30px',
     },
     'chip-label': {
       color: theme.palette.text.secondary,
@@ -100,6 +104,8 @@ const CategoryPage = ({
   categorySelected,
   productsByCategory,
   products,
+  filterByPrice,
+  filterByStore,
 }) => {
   const classes = CategoryPageStyles()
   const [resultList, setResultList] = useState([])
@@ -118,14 +124,15 @@ const CategoryPage = ({
     dispatch(SetProductsByCategory(products))
     setResultList(products.data)
     setResultsFiltered(products.data)
+    dispatch(SetSponsors(products.sponsors))
   }, [products])
-  const handleFilterByStore = (storeClicked?: Seller) => {
-    if (!storeClicked) {
+  const handleFilterByStore = (storeClicked?: string) => {
+    if (!storeClicked || storeClicked === 'todos') {
       setResultsFiltered(productsByCategory.data)
       return
     }
     const newListFilteresByStore = productsByCategory.data.filter(
-      (item: ItemProduct) => item.seller.key === storeClicked?.key,
+      (item: ItemProduct) => item.seller.key === storeClicked,
     )
     setResultsFiltered(newListFilteresByStore)
   }
@@ -153,6 +160,13 @@ const CategoryPage = ({
     )
     setResultList(sortedList)
   }
+  useEffect(() => {
+    setPriceFilter(filterByPrice)
+    sortByPrice(resultsFiltered)
+  }, [filterByPrice])
+  useEffect(() => {
+    handleFilterByStore(filterByStore)
+  }, [filterByStore])
   return (
     <section>
       <Backdrop
@@ -163,95 +177,6 @@ const CategoryPage = ({
         <CircularProgress color="inherit" />
       </Backdrop>
       <HomeTemplate>
-        <section className={classes['container-lookup']}>
-          <TextField
-            value={inputValue}
-            className={classes.input}
-            id="outlined-basic"
-            label="Marca, Serie o nombre del producto"
-            variant="outlined"
-            onChange={(e) => handleInput(e)}
-            onKeyPress={(e) => hanldeEnter(e)}
-            autoComplete={'off'}
-          />
-          <Button
-            className={classes.button}
-            variant="contained"
-            color="primary"
-            //onClick={amendQuery}
-          >
-            Buscar
-          </Button>
-        </section>
-        <section className={classes['container-sponsors']}>
-          {productsByCategory &&
-          productsByCategory.sponsors &&
-          productsByCategory.sponsors.length ? (
-            <span className={classes['chip-label']}>Tiendas :</span>
-          ) : (
-            ''
-          )}
-          <section className={classes['chip-contaier']}>
-            {productsByCategory && productsByCategory.sponsors.length
-              ? productsByCategory.sponsors.map((item: Seller) => (
-                  <Chip
-                    className={classes['chip-component']}
-                    label={item.name}
-                    color="primary"
-                    size="small"
-                    icon={<ContactSupportIcon />}
-                    onClick={() => handleFilterByStore(item)}
-                  />
-                ))
-              : ''}
-
-            {productsByCategory && productsByCategory.sponsors.length ? (
-              <Chip
-                className={classes['chip-component']}
-                label={'Todos'}
-                color="primary"
-                size="small"
-                icon={<ContactSupportIcon />}
-                onClick={() => handleFilterByStore()}
-              />
-            ) : (
-              ''
-            )}
-          </section>
-        </section>
-
-        <section className={classes.filter}>
-          {productsByCategory && productsByCategory.sponsors.length ? (
-            <span className={classes['chip-filter']}>Filtrar Precio :</span>
-          ) : (
-            ''
-          )}
-          <section
-            className={classes['filter-icons']}
-            style={{ border: !priceFilter ? '2px dotted black' : '' }}
-          >
-            <ArrowDownwardIcon
-              onClick={() => {
-                setPriceFilter(false)
-                sortByPrice(resultList)
-              }}
-              fontSize="small"
-            />
-          </section>
-          <section
-            className={classes['filter-icons']}
-            style={{ border: priceFilter ? '2px dotted black' : '' }}
-          >
-            <ArrowUpwardIcon
-              onClick={() => {
-                setPriceFilter(true)
-                sortByPrice(resultList)
-              }}
-              fontSize="small"
-            />
-          </section>
-        </section>
-
         <section className={classes['cards-container']}>
           {resultsFiltered && resultsFiltered.length
             ? resultsFiltered.map(

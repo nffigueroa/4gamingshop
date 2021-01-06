@@ -1,13 +1,20 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { Seller } from '../interfaces/ItemProduct'
 import { ResponseCategories, ResponseSearch } from '../interfaces/Responses'
-
+export enum filterByPriceEnum {
+  UP,
+  DOWN,
+}
 export interface StateInterface {
   inventory: {
     searchResult: ResponseSearch
     initialResults: ResponseSearch
     listCategories: ResponseCategories
     productsByCategory: any
+    filterByPrice: filterByPriceEnum
+    filterByStore: string
+    sponsors: Array<Seller>
   }
   navigation: {
     categorySelected: string
@@ -30,6 +37,9 @@ const withRedux = (Component: Function) => {
     productsByCategory: state.inventory.productsByCategory,
     menuOpened: state.navigation.menuOpened,
     pageLoading: state.navigation.page_loading,
+    filterByPrice: state.inventory.filterByPrice,
+    filterByStore: state.inventory.filterByStore,
+    sponsors: state.inventory.sponsors,
   })
   return connect(mapStateToProps)(WithRedux)
 }

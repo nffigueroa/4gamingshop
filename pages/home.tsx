@@ -10,13 +10,14 @@ import {
 } from '@material-ui/core'
 import React, { useEffect, useState } from 'react'
 import CardComponent from '../src/components/card.component'
-import withRedux from '../src/enhandcer/withRedux'
+import withRedux, { filterByPriceEnum } from '../src/enhandcer/withRedux'
 import { ResponseCategories, ResponseSearch } from '../src/interfaces/Responses'
 import HomeTemplate from '../src/template/home.template'
 import {
   SetCagories,
   SetInitialResults,
   SetSearchResult,
+  SetSponsors,
 } from '../state/actions/inventory.actions'
 import ContactSupportIcon from '@material-ui/icons/ContactSupport'
 import { ItemProduct, Seller } from '../src/interfaces/ItemProduct'
@@ -42,6 +43,7 @@ const HomePageStyles = makeStyles((theme: Theme) =>
       flexWrap: 'wrap',
       width: '100%',
       justifyContent: 'space-around',
+      marginLeft: '50px',
     },
     input: {
       height: '30px',
@@ -113,13 +115,14 @@ const HomePage = (props) => {
     categoriesDB,
     initialRestults,
     initResults,
+    filterByPrice,
+    filterByStore,
   } = props
-
   const classes = HomePageStyles()
   const [inputValue, setInputValue] = useState('')
   const [openBackdrop, setOpenBackDrop] = useState(false)
   const [resultList, setResultList] = useState([])
-  const [priceFilter, setPriceFilter] = useState(true)
+  const [priceFilter, setPriceFilter] = useState(filterByPriceEnum.DOWN)
   const [snackBAr, setSnackBAr] = useState({ show: false, msg: '' })
   const handleClose = () => {
     setOpenBackDrop(false)
@@ -129,20 +132,20 @@ const HomePage = (props) => {
   }
   const sortByPrice = (arr: Array<ItemProduct>) => {
     const sortedList = arr.sort((a: ItemProduct, b: ItemProduct) =>
-      !priceFilter
+      priceFilter === filterByPriceEnum.UP
         ? Number(a.value) - Number(b.value)
         : Number(b.value) - Number(a.value),
     )
     setResultList(sortedList)
   }
   const handleInput = ({ target: { value } }) => setInputValue(value)
-  const handleFilterByStore = (storeClicked?: Seller) => {
-    if (!storeClicked) {
+  const handleFilterByStore = (storeClicked: string) => {
+    if (!storeClicked || storeClicked === 'todos') {
       setResultList(inventory.response)
       return
     }
     const newListFilteresByStore = inventory.response.filter(
-      (item: ItemProduct) => item.seller.key === storeClicked?.key,
+      (item: ItemProduct) => item.seller.key === storeClicked,
     )
     setResultList(newListFilteresByStore)
   }
@@ -157,6 +160,7 @@ const HomePage = (props) => {
           setSnackBAr({ show: true, msg: 'No se encontraron resultados' })
         const res = response.status === 404 ? initialRestults : response
         dispatch(SetSearchResult(res))
+        dispatch(SetSponsors(res.sponsors))
         setOpenBackDrop(false)
       })
       .catch((e) =>
@@ -179,9 +183,18 @@ const HomePage = (props) => {
 
   useEffect(() => {
     dispatch(SetSearchResult(initResults))
+    dispatch(SetSponsors(initResults.sponsors))
     dispatch(SetInitialResults(initResults))
     dispatch(SetCagories(categoriesDB))
   }, [])
+
+  useEffect(() => {
+    setPriceFilter(filterByPrice)
+    sortByPrice(inventory?.response)
+  }, [filterByPrice])
+  useEffect(() => {
+    handleFilterByStore(filterByStore)
+  }, [filterByStore])
   return (
     <section className={classes['home-container']}>
       <Snackbar
@@ -198,93 +211,6 @@ const HomePage = (props) => {
         <CircularProgress color="inherit" />
       </Backdrop>
       <HomeTemplate>
-        <section className={classes['container-lookup']}>
-          <TextField
-            value={inputValue}
-            className={classes.input}
-            id="outlined-basic"
-            label="Marca, Serie o nombre del producto"
-            variant="outlined"
-            onChange={(e) => handleInput(e)}
-            onKeyPress={(e) => hanldeEnter(e)}
-            autoComplete={'off'}
-          />
-          <Button
-            className={classes.button}
-            variant="contained"
-            color="primary"
-            onClick={amendQuery}
-          >
-            Buscar
-          </Button>
-        </section>
-
-        <section className={classes['container-sponsors']}>
-          {inventory && inventory.sponsors && inventory.sponsors.length ? (
-            <span className={classes['chip-label']}>Tiendas :</span>
-          ) : (
-            ''
-          )}
-          <section className={classes['chip-contaier']}>
-            {inventory && inventory.sponsors && inventory.sponsors.length
-              ? inventory.sponsors.map((item: Seller) => (
-                  <Chip
-                    className={classes['chip-component']}
-                    label={item.name}
-                    color="primary"
-                    size="small"
-                    icon={<ContactSupportIcon />}
-                    onClick={() => handleFilterByStore(item)}
-                  />
-                ))
-              : ''}
-
-            {inventory && inventory.sponsors && inventory.sponsors.length ? (
-              <Chip
-                className={classes['chip-component']}
-                label={'Todos'}
-                color="primary"
-                size="small"
-                icon={<ContactSupportIcon />}
-                onClick={() => handleFilterByStore()}
-              />
-            ) : (
-              ''
-            )}
-          </section>
-        </section>
-        <section className={classes.filter}>
-          {inventory && inventory.sponsors && inventory.sponsors.length ? (
-            <span className={classes['chip-filter']}>Filtrar Precio :</span>
-          ) : (
-            ''
-          )}
-          <section
-            className={classes['filter-icons']}
-            style={{ border: priceFilter ? '2px dotted black' : '' }}
-          >
-            <ArrowDownwardIcon
-              onClick={() => {
-                setPriceFilter(true)
-                sortByPrice(resultList)
-              }}
-              fontSize="small"
-            />
-          </section>
-          <section
-            className={classes['filter-icons']}
-            style={{ border: !priceFilter ? '2px dotted black' : '' }}
-          >
-            <ArrowUpwardIcon
-              onClick={() => {
-                setPriceFilter(false)
-                sortByPrice(resultList)
-              }}
-              fontSize="small"
-            />
-          </section>
-        </section>
-
         <section className={classes['cards-container']}>
           {resultList && resultList.length
             ? resultList.map(
