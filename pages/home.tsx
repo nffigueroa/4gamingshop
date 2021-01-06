@@ -41,9 +41,17 @@ const HomePageStyles = makeStyles((theme: Theme) =>
       marginTop: '30px',
       display: 'flex',
       flexWrap: 'wrap',
-      width: '100%',
+      width: '80%',
       justifyContent: 'space-around',
-      marginLeft: '50px',
+      margin: '30px auto auto auto',
+      [theme.breakpoints.up('md')]: {
+        marginTop: '30px',
+        display: 'flex',
+        flexWrap: 'wrap',
+        width: '100%',
+        justifyContent: 'space-around',
+        marginLeft: '50px',
+      },
     },
     input: {
       height: '30px',
@@ -117,9 +125,11 @@ const HomePage = (props) => {
     initResults,
     filterByPrice,
     filterByStore,
+    lookupValue,
+    searchBy,
+    resultFromSearch,
   } = props
   const classes = HomePageStyles()
-  const [inputValue, setInputValue] = useState('')
   const [openBackdrop, setOpenBackDrop] = useState(false)
   const [resultList, setResultList] = useState([])
   const [priceFilter, setPriceFilter] = useState(filterByPriceEnum.DOWN)
@@ -138,7 +148,6 @@ const HomePage = (props) => {
     )
     setResultList(sortedList)
   }
-  const handleInput = ({ target: { value } }) => setInputValue(value)
   const handleFilterByStore = (storeClicked: string) => {
     if (!storeClicked || storeClicked === 'todos') {
       setResultList(inventory.response)
@@ -149,30 +158,15 @@ const HomePage = (props) => {
     )
     setResultList(newListFilteresByStore)
   }
-  const amendQuery = () => {
-    if (inputValue && inputValue.length < 2) {
+
+  useEffect(() => {
+    if (!resultFromSearch || !resultFromSearch.response.length) {
+      dispatch(SetSearchResult(initResults))
       return
     }
-    fetch(`${process.env.NEXT_PUBLIC_SEARCHENDPOINT}?name=${inputValue}`)
-      .then((response) => response.json())
-      .then(({ response }) => {
-        response.status === 404 &&
-          setSnackBAr({ show: true, msg: 'No se encontraron resultados' })
-        const res = response.status === 404 ? initialRestults : response
-        dispatch(SetSearchResult(res))
-        dispatch(SetSponsors(res.sponsors))
-        setOpenBackDrop(false)
-      })
-      .catch((e) =>
-        setSnackBAr({ show: true, msg: 'Cannot reach the initial results' }),
-      )
-  }
-  const hanldeEnter = ({ key }) => {
-    if (key === 'Enter') {
-      setOpenBackDrop(true)
-      amendQuery()
-    }
-  }
+    dispatch(SetSearchResult(resultFromSearch))
+    dispatch(SetSponsors(resultFromSearch.sponsors))
+  }, [resultFromSearch])
 
   useEffect(() => {
     if (!inventory) {
@@ -180,7 +174,11 @@ const HomePage = (props) => {
     }
     sortByPrice(inventory?.response)
   }, [inventory?.response])
-
+  useEffect(() => {
+    dispatch(SetSponsors(initResults.sponsors))
+    dispatch(SetInitialResults(initResults))
+    dispatch(SetCagories(categoriesDB))
+  }, [initResults])
   useEffect(() => {
     dispatch(SetSearchResult(initResults))
     dispatch(SetSponsors(initResults.sponsors))
@@ -190,7 +188,7 @@ const HomePage = (props) => {
 
   useEffect(() => {
     setPriceFilter(filterByPrice)
-    sortByPrice(inventory?.response)
+    sortByPrice(resultList)
   }, [filterByPrice])
   useEffect(() => {
     handleFilterByStore(filterByStore)
@@ -244,10 +242,15 @@ const HomePage = (props) => {
 }
 
 export async function getServerSideProps({ query }) {
+  const { searchBy = null } = query
   const gqlClient = new GraphQLClient(process.env.GRAPHQL_ENDPOINT)
   const {
     categoriesList,
     initialResults: { response, sponsors },
+    searchByProduct: {
+      response: resultsFromSearchResponse,
+      sponsors: resultsFromSearchsponsors,
+    },
   } = await gqlClient.request(`query {
     initialResults {
       response {
@@ -267,11 +270,33 @@ export async function getServerSideProps({ query }) {
       }
     }
     categoriesList
+    searchByProduct(name: "${searchBy}") {
+      response {
+        name
+        value
+        seller {
+          key
+          name
+        }
+        category
+        image
+        urlRefer
+      }
+    sponsors {
+        key
+        name
+      }
+    }
   }`)
+
   return {
     props: {
       categoriesDB: categoriesList,
       initResults: { response, sponsors },
+      resultFromSearch: {
+        response: resultsFromSearchResponse,
+        sponsors: resultsFromSearchsponsors,
+      },
     },
   }
 }

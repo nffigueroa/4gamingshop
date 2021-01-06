@@ -28,15 +28,21 @@ const CardComponentClasses = makeStyles((theme: Theme) =>
       width: '100%',
       display: 'inline',
       position: 'relative',
-      [theme.breakpoints.up(600)]: {
-        width: '20%',
+      [theme.breakpoints.up('sm')]: {
+        width: '30%',
         marginRight: '10px',
+      },
+      [theme.breakpoints.up('md')]: {
+        width: '20%',
       },
     },
     title: {
       fontSize: '14px',
       width: 'auto',
       height: '40px',
+      [theme.breakpoints.up('sm')]: {
+        height: '80px',
+      },
     },
     media: {
       height: 0,
@@ -45,7 +51,6 @@ const CardComponentClasses = makeStyles((theme: Theme) =>
     card: {
       [theme.breakpoints.up('md')]: {},
       marginBottom: '20px',
-      width: '300px',
     },
     expand: {
       transform: 'rotate(0deg)',
@@ -145,9 +150,9 @@ const CardComponent = ({ title, price, seller, img, category, url }) => {
             <ShoppingCartIcon />
           </CardActions>
           */}
+            <RedirectBottom url={url} />
           </Collapse>
         </CardContent>
-        <RedirectBottom url={url} />
       </Card>
     </section>
   )

@@ -24,7 +24,7 @@ const HomeTemplateClasses = makeStyles((theme: Theme) =>
       [theme.breakpoints.up('md')]: {
         width: '90%',
         backgroundColor: '#303030',
-        margin: '130px auto auto auto',
+        margin: '115px auto auto auto',
         borderRadius: '10px',
       },
     },

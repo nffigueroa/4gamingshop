@@ -22,6 +22,8 @@ export interface StateInterface {
       left: boolean
     }
     page_loading: boolean
+    lookupValue: string
+    searchBy: string
   }
 }
 
@@ -40,6 +42,8 @@ const withRedux = (Component: Function) => {
     filterByPrice: state.inventory.filterByPrice,
     filterByStore: state.inventory.filterByStore,
     sponsors: state.inventory.sponsors,
+    lookupValue: state.navigation.lookupValue,
+    searchBy: state.navigation.searchBy,
   })
   return connect(mapStateToProps)(WithRedux)
 }

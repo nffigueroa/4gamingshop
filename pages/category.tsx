@@ -40,9 +40,17 @@ const CategoryPageStyles = makeStyles((theme) =>
       marginTop: '30px',
       display: 'flex',
       flexWrap: 'wrap',
-      width: '100%',
+      width: '80%',
       justifyContent: 'space-around',
-      marginLeft: '30px',
+      margin: '30px auto auto auto',
+      [theme.breakpoints.up('md')]: {
+        marginTop: '30px',
+        display: 'flex',
+        flexWrap: 'wrap',
+        width: '100%',
+        justifyContent: 'space-around',
+        marginLeft: '30px',
+      },
     },
     'chip-label': {
       color: theme.palette.text.secondary,
@@ -106,12 +114,12 @@ const CategoryPage = ({
   products,
   filterByPrice,
   filterByStore,
+  searchBy,
 }) => {
   const classes = CategoryPageStyles()
   const [resultList, setResultList] = useState([])
   const [openBackdrop, setOpenBackDrop] = useState(false)
   const [priceFilter, setPriceFilter] = useState(false)
-  const [inputValue, setInputValue] = useState('')
   const [resultsFiltered, setResultsFiltered] = useState([])
 
   const handleClose = () => {
@@ -121,6 +129,7 @@ const CategoryPage = ({
   useEffect(() => sortByPrice(resultsFiltered), [resultsFiltered])
 
   useEffect(() => {
+    console.log('[products]')
     dispatch(SetProductsByCategory(products))
     setResultList(products.data)
     setResultsFiltered(products.data)
@@ -131,26 +140,22 @@ const CategoryPage = ({
       setResultsFiltered(productsByCategory.data)
       return
     }
-    const newListFilteresByStore = productsByCategory.data.filter(
+    const newListFilteresByStore = resultsFiltered.filter(
       (item: ItemProduct) => item.seller.key === storeClicked,
     )
     setResultsFiltered(newListFilteresByStore)
   }
-  const handleInput = ({ target: { value } }) => setInputValue(value)
-  const hanldeEnter = ({ key }) => {
-    if (key === 'Enter') {
-      if (inputValue.length < 2) {
-        setResultsFiltered(resultList)
-        return
-      }
-      setResultsFiltered(
-        resultList.filter(
-          (item: ItemProduct) =>
-            item.name &&
-            item.name.toUpperCase().includes(inputValue.toUpperCase()),
-        ),
-      )
+  const hanldeEnter = () => {
+    if (!searchBy || searchBy.length < 2) {
+      setResultsFiltered(resultList)
+      return
     }
+    setResultsFiltered(
+      resultList.filter(
+        (item: ItemProduct) =>
+          item.name && item.name.toUpperCase().includes(searchBy.toUpperCase()),
+      ),
+    )
   }
   const sortByPrice = (arr: Array<ItemProduct>) => {
     const sortedList = arr.sort((a: ItemProduct, b: ItemProduct) =>
@@ -161,12 +166,28 @@ const CategoryPage = ({
     setResultList(sortedList)
   }
   useEffect(() => {
+    console.log('[filterByPrice]')
     setPriceFilter(filterByPrice)
     sortByPrice(resultsFiltered)
   }, [filterByPrice])
   useEffect(() => {
+    console.log('[filterByStore]')
     handleFilterByStore(filterByStore)
   }, [filterByStore])
+  useEffect(() => {
+    console.log('[]')
+    handleFilterByStore('todos')
+    sortByPrice(resultsFiltered)
+  }, [])
+  useEffect(() => {
+    console.log('searchBy')
+    if (!searchBy) {
+      setResultsFiltered(products.data.length ? products.data : resultsFiltered)
+      return
+    }
+    console.log(searchBy)
+    hanldeEnter()
+  }, [searchBy])
   return (
     <section>
       <Backdrop
