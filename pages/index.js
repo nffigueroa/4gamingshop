@@ -1,6 +1,12 @@
 import { GraphQLClient } from "graphql-request";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 import HomePage from "./home";
 export default function Home(props) {
+  const router = useRouter();
+  useEffect(() => {
+    router.push("/home");
+  }, []);
   return <HomePage {...props} />;
 }
 

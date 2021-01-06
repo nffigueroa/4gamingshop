@@ -182,7 +182,9 @@ const CategoryPage = ({
   useEffect(() => {
     console.log('searchBy')
     if (!searchBy) {
-      setResultsFiltered(products.data.length ? products.data : resultsFiltered)
+      setResultsFiltered(
+        products && products.data.length ? products.data : resultsFiltered,
+      )
       return
     }
     console.log(searchBy)
