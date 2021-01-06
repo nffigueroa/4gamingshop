@@ -214,11 +214,11 @@ const HeaderComponent = ({
     dispatch(SetMenuOpened({ ...menuOpened, [anchor]: open }))
   }
   const hanldeEnter = ({ key }) => {
-    if (key === 'Enter' && router.route === '/home') {
+    if (key === 'Enter' && router.route === '/') {
       Router.events.on('routeChangeStart', () => setOpenBackDrop(true))
       Router.events.on('routeChangeComplete', () => setOpenBackDrop(false))
       router.push({
-        pathname: '/home',
+        pathname: '/',
         query: {
           searchBy: inputValue,
         },
@@ -239,7 +239,7 @@ const HeaderComponent = ({
   const redirectToHome = () => {
     Router.events.on('routeChangeStart', () => setOpenBackDrop(true))
     Router.events.on('routeChangeComplete', () => setOpenBackDrop(false))
-    router.push('/home')
+    router.push('/')
   }
   const handleCategorySelected = (category: string) => {
     dispatch(SetCategorySelected(category))
