@@ -7,14 +7,20 @@ import {
   CardMedia,
   Collapse,
   createStyles,
+  IconButton,
   makeStyles,
   Theme,
   Typography,
   useMediaQuery,
   useTheme,
 } from '@material-ui/core'
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+import ThumbUpAltIcon from '@material-ui/icons/ThumbUpAlt'
+import ThumbDownIcon from '@material-ui/icons/ThumbDown'
+import clsx from 'clsx'
 import React, { useState } from 'react'
 import Image from 'next/image'
+import ShoppingCartIcon from '@material-ui/icons/ShoppingCart'
 
 const CardComponentClasses = makeStyles((theme: Theme) =>
   createStyles({
@@ -22,25 +28,42 @@ const CardComponentClasses = makeStyles((theme: Theme) =>
       width: '100%',
       display: 'inline',
       position: 'relative',
-      [theme.breakpoints.up(600)]: {
-        width: '20%',
+      [theme.breakpoints.up('sm')]: {
+        width: '30%',
         marginRight: '10px',
+      },
+      [theme.breakpoints.up('md')]: {
+        width: '20%',
       },
     },
     title: {
-      fontSize: '20px',
-      textOverflow: 'ellipsis',
-      overflow: 'hidden',
-      height: '60px',
+      fontSize: '14px',
       width: 'auto',
+      height: '40px',
+      [theme.breakpoints.up('sm')]: {
+        height: '80px',
+      },
+      [theme.breakpoints.up('md')]: {
+        height: '40px',
+      },
     },
     media: {
       height: 0,
       paddingTop: '56.25%', // 16:9
     },
     card: {
-      [theme.breakpoints.up(900)]: {},
+      [theme.breakpoints.up('md')]: {},
       marginBottom: '20px',
+    },
+    expand: {
+      transform: 'rotate(0deg)',
+      marginLeft: 'auto',
+      transition: theme.transitions.create('transform', {
+        duration: theme.transitions.duration.shortest,
+      }),
+    },
+    expandOpen: {
+      transform: 'rotate(180deg)',
     },
   }),
 )
@@ -62,8 +85,9 @@ const RedirectBottom = ({ url }) => {
       className={classes['container-redirect']}
       onClick={() => (url ? (window.location.href = url) : '')}
     >
-      <Box bgcolor="success.main" color="primary.contrastText" p={2}>
-        VER EN TIENDA
+      <Box bgcolor="success.main" color="primary.contrastText" p={1}>
+        <span>VER EN TIENDA</span>
+        <ShoppingCartIcon />
       </Box>
     </section>
   )
@@ -76,11 +100,7 @@ const CardComponent = ({ title, price, seller, img, category, url }) => {
   const matches = useMediaQuery(theme.breakpoints.up('md'))
   return (
     <section className={classes['container-card']}>
-      <Card
-        className={classes.card}
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
-      >
+      <Card className={classes.card}>
         <CardContent>
           {img ? (
             <CardMedia className={classes.media} image={img} title="Item" />
@@ -100,23 +120,42 @@ const CardComponent = ({ title, price, seller, img, category, url }) => {
             {title}
           </Typography>
           <Typography variant="h5" component="h2">
-            Precio: $ {new Intl.NumberFormat().format(price)}
+            $ {new Intl.NumberFormat().format(price)}
           </Typography>
-          <Typography variant="body2" component="p">
-            Vendedor: {seller}
-          </Typography>
-          <Typography variant="body2" component="p">
-            Categoria: {category}
-          </Typography>
+          <CardActions
+            style={{ height: '5px', marginTop: '-20px' }}
+            disableSpacing
+          >
+            <IconButton
+              className={clsx(classes.expand, {
+                [classes.expandOpen]: hover,
+              })}
+              onClick={() => {
+                setHover(!hover)
+              }}
+              aria-expanded={hover}
+              aria-label="show more"
+            >
+              <ExpandMoreIcon />
+            </IconButton>
+          </CardActions>
+          <Collapse in={hover} timeout="auto" unmountOnExit>
+            <CardContent>
+              <Typography variant="body2" component="p">
+                Vendedor: {seller}
+              </Typography>
+              <Typography variant="body2" component="p">
+                Categoria: {category}
+              </Typography>
+            </CardContent>
 
-          {/* <CardActions style={{ position: 'absolute', bottom: '40px' }}>
+            {/* <CardActions style={{ position: 'absolute', bottom: '40px' }}>
             <ShoppingCartIcon />
           </CardActions>
           */}
+            <RedirectBottom url={url} />
+          </Collapse>
         </CardContent>
-        <Collapse in={(!!url && hover) || !matches}>
-          <RedirectBottom url={url} />
-        </Collapse>
       </Card>
     </section>
   )

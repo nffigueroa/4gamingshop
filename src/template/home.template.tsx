@@ -21,12 +21,18 @@ const HomeTemplateClasses = makeStyles((theme: Theme) =>
   createStyles({
     'home-template-container': {
       width: '100%',
-      backgroundColor: theme.palette.background.default,
-      marginTop: '100px',
+      [theme.breakpoints.up('md')]: {
+        width: '90%',
+        backgroundColor: '#303030',
+        margin: '115px auto auto auto',
+        borderRadius: '10px',
+      },
     },
     'header-tmp': {},
     menu: {
       display: 'inline-block',
+      position: 'relative',
+      left: '10px',
     },
     child: {
       display: 'inline-block',
