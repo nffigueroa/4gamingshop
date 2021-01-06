@@ -1,11 +1,8 @@
 import {
   Backdrop,
-  Button,
-  Chip,
   CircularProgress,
   createStyles,
   makeStyles,
-  TextField,
   Theme,
 } from '@material-ui/core'
 import React, { useEffect, useState } from 'react'
@@ -19,12 +16,9 @@ import {
   SetSearchResult,
   SetSponsors,
 } from '../state/actions/inventory.actions'
-import ContactSupportIcon from '@material-ui/icons/ContactSupport'
 import { ItemProduct, Seller } from '../src/interfaces/ItemProduct'
 import Snackbar from '@material-ui/core/Snackbar'
-import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward'
-import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward'
-import { request, gql, GraphQLClient } from 'graphql-request'
+import { GraphQLClient } from 'graphql-request'
 
 const HomePageStyles = makeStyles((theme: Theme) =>
   createStyles({
