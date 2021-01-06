@@ -43,6 +43,9 @@ const CardComponentClasses = makeStyles((theme: Theme) =>
       [theme.breakpoints.up('sm')]: {
         height: '80px',
       },
+      [theme.breakpoints.up('md')]: {
+        height: '40px',
+      },
     },
     media: {
       height: 0,

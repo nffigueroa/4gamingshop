@@ -191,6 +191,9 @@ const HomePage = (props) => {
     sortByPrice(resultList)
   }, [filterByPrice])
   useEffect(() => {
+    if (!inventory) {
+      return
+    }
     handleFilterByStore(filterByStore)
   }, [filterByStore])
   return (
