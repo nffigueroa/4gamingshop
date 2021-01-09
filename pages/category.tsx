@@ -129,14 +129,16 @@ const CategoryPage = ({
   useEffect(() => sortByPrice(resultsFiltered), [resultsFiltered])
 
   useEffect(() => {
-    console.log('[products]')
     dispatch(SetProductsByCategory(products))
     setResultList(products.data)
     setResultsFiltered(products.data)
     dispatch(SetSponsors(products.sponsors))
   }, [products])
   const handleFilterByStore = (storeClicked?: string) => {
-    if (!storeClicked || storeClicked === 'todos') {
+    if (
+      (!storeClicked && productsByCategory) ||
+      (storeClicked === 'todos' && productsByCategory)
+    ) {
       setResultsFiltered(productsByCategory.data)
       return
     }
@@ -166,21 +168,17 @@ const CategoryPage = ({
     setResultList(sortedList)
   }
   useEffect(() => {
-    console.log('[filterByPrice]')
     setPriceFilter(filterByPrice)
     sortByPrice(resultsFiltered)
   }, [filterByPrice])
   useEffect(() => {
-    console.log('[filterByStore]')
     handleFilterByStore(filterByStore)
   }, [filterByStore])
   useEffect(() => {
-    console.log('[]')
     handleFilterByStore('todos')
     sortByPrice(resultsFiltered)
   }, [])
   useEffect(() => {
-    console.log('searchBy')
     if (!searchBy) {
       setResultsFiltered(
         products && products.data.length ? products.data : resultsFiltered,
