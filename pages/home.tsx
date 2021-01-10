@@ -44,7 +44,7 @@ const HomePageStyles = makeStyles((theme: Theme) =>
         flexWrap: 'wrap',
         width: '100%',
         justifyContent: 'space-around',
-        marginLeft: '50px',
+        //marginLeft: '50px',
       },
     },
     input: {

@@ -36,6 +36,9 @@ const HomeTemplateClasses = makeStyles((theme: Theme) =>
     },
     child: {
       display: 'inline-block',
+      [theme.breakpoints.up('md')]: {
+        width: '100%',
+      },
     },
     body: {
       display: 'flex',

@@ -332,7 +332,7 @@ const HeaderComponent = ({
         <TextField
           className={classes.input}
           id="lookup-field"
-          label="Marca, serie o nombre del producto"
+          label="Serie o nombre del producto"
           variant="outlined"
           onChange={({ target: { value } }) => {
             setInputValue(value)
