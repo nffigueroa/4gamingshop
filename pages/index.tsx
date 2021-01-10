@@ -5,6 +5,7 @@ import {
   makeStyles,
   Theme,
 } from '@material-ui/core'
+import Head from 'next/head'
 import React, { useEffect, useState } from 'react'
 import CardComponent from '../src/components/card.component'
 import withRedux, { filterByPriceEnum } from '../src/enhandcer/withRedux'
@@ -192,6 +193,10 @@ const HomePage = (props) => {
   }, [filterByStore])
   return (
     <section className={classes['home-container']}>
+      <Head>
+        <link rel="shortcut icon" href="/img/Logo4Gamer.png" />
+        <title>HomePage</title>
+      </Head>
       <Snackbar
         autoHideDuration={6000}
         open={snackBAr.show}
@@ -259,7 +264,7 @@ export async function getServerSideProps({ query }) {
         }
         category
         image
-        urlRefer
+        url
       }
       sponsors {
         key
@@ -277,7 +282,7 @@ export async function getServerSideProps({ query }) {
         }
         category
         image
-        urlRefer
+        url
       }
     sponsors {
         key
