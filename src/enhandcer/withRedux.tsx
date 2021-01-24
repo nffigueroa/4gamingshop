@@ -36,7 +36,8 @@ export interface StateInterface {
   }
   user: {
     userProperties: User
-    tkn: string
+    tkn: string,
+    userProducts: Array<ItemProduct>
   }
 }
 
@@ -59,6 +60,7 @@ const withRedux = (Component: Function) => {
     searchBy: state.navigation.searchBy,
     userProperties: state.user.userProperties,
     tkn: state.user.tkn,
+    userProducts: state.user.userProducts
   })
   return connect(mapStateToProps)(WithRedux)
 }

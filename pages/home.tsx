@@ -124,6 +124,7 @@ const HomePage = (props) => {
     searchBy,
     resultFromSearch,
     userProperties,
+    userProducts,
   } = props
   const classes = HomePageStyles()
   const [openBackdrop, setOpenBackDrop] = useState(false)
@@ -156,7 +157,10 @@ const HomePage = (props) => {
   }
 
   useEffect(() => {
-    if (!resultFromSearch || !resultFromSearch.response.length) {
+    if (
+      !resultFromSearch ||
+      !(resultFromSearch.response && !resultFromSearch.response.length)
+    ) {
       dispatch(SetSearchResult(initResults))
       return
     }
@@ -176,6 +180,9 @@ const HomePage = (props) => {
     dispatch(SetCagories(categoriesDB))
   }, [initResults])
   useEffect(() => {
+    if (userProducts && userProducts.length) {
+      return
+    }
     dispatch(SetSearchResult(initResults))
     dispatch(SetSponsors(initResults.sponsors))
     dispatch(SetInitialResults(initResults))
@@ -186,6 +193,10 @@ const HomePage = (props) => {
     setPriceFilter(filterByPrice)
     sortByPrice(resultList)
   }, [filterByPrice])
+  useEffect(() => {
+    dispatch(SetSearchResult(userProducts))
+    sortByPrice(resultList)
+  }, [userProducts])
   useEffect(() => {
     if (!inventory) {
       return

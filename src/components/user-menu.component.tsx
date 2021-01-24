@@ -103,13 +103,12 @@ const UserMenu = ({
   }, [open])
   const getMyProducts = async () => {
     const { email } = userProperties
-    router.push('/home')
-
     const { response, sponsors } = await fetch(
       `${process.env.NEXT_PUBLIC_CALL_FAVORITEs}?email=${email}`,
     ).then((res) => res.json())
     dispatch(SetSearchResult({ response }))
     setOpen(false)
+    router.push('/home')
   }
   const doLogOut = () => {
     dispatch(SetSearchResult(initialResults))

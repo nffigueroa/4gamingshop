@@ -256,11 +256,11 @@ const HeaderComponent = ({
     dispatch(SetMenuOpened({ ...menuOpened, [anchor]: open }))
   }
   const hanldeEnter = ({ key }) => {
-    if (key === 'Enter' && router.route === '/') {
+    if (key === 'Enter' && (router.route === '/' || router.route === '/home')) {
       Router.events.on('routeChangeStart', () => setOpenBackDrop(true))
       Router.events.on('routeChangeComplete', () => setOpenBackDrop(false))
       router.push({
-        pathname: '/',
+        pathname: '/home',
         query: {
           searchBy: inputValue,
         },
