@@ -9,7 +9,7 @@ import {
 } from '@material-ui/core'
 import React, { useEffect, useState } from 'react'
 import CardComponent from '../src/components/card.component'
-import withRedux from '../src/enhandcer/withRedux'
+import withRedux, { User } from '../src/enhandcer/withRedux'
 import { ItemProduct, Seller } from '../src/interfaces/ItemProduct'
 import HomeTemplate from '../src/template/home.template'
 import {
@@ -24,6 +24,7 @@ import useSWR from 'swr'
 import { Router, useRouter } from 'next/router'
 import { gql, useLazyQuery, useQuery } from '@apollo/client'
 import { SetPageLoading } from '../state/actions/navigtation.actions'
+import { SetUserProperties } from '../state/actions/user.actions'
 
 const CategoryPageStyles = makeStyles((theme) =>
   createStyles({
@@ -115,6 +116,7 @@ const CategoryPage = ({
   filterByPrice,
   filterByStore,
   searchBy,
+  userProperties,
 }) => {
   const classes = CategoryPageStyles()
   const [resultList, setResultList] = useState([])
@@ -188,6 +190,37 @@ const CategoryPage = ({
     console.log(searchBy)
     hanldeEnter()
   }, [searchBy])
+  const handleFavoriteClick = async (_id: string, like: boolean) => {
+    console.log('Si entro', _id, like)
+
+    if (_id && like) {
+      if (like) {
+        const { user }: { user: User } = await fetch(
+          `${process.env.NEXT_PUBLIC_ADD_FAVORITE}`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email: userProperties.email, id: _id }),
+          },
+        ).then((res) => res.json())
+        dispatch(SetUserProperties({ ...user }))
+      } else {
+        const { user }: { user: User } = await fetch(
+          `${process.env.NEXT_PUBLIC_REMOVE_FAVORITE}`,
+          {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email: userProperties.email, id: _id }),
+          },
+        ).then((res) => res.json())
+        dispatch(SetUserProperties({ ...user }))
+      }
+    }
+  }
   return (
     <section>
       <Backdrop
@@ -209,10 +242,12 @@ const CategoryPage = ({
                     image,
                     category,
                     url,
+                    _id,
                   },
                   index: number,
                 ) => (
                   <CardComponent
+                    id={_id}
                     key={index}
                     title={name}
                     price={value}
@@ -220,6 +255,7 @@ const CategoryPage = ({
                     img={image}
                     category={category}
                     url={url}
+                    onHeartClick={handleFavoriteClick}
                   />
                 ),
               )
@@ -236,6 +272,7 @@ export async function getServerSideProps({ query }) {
   } = await gqlClient.request(`query {
     searchProductByCategory(categoryName: "${query.filterby}") {
       response {
+        _id
         name
         value
         seller {

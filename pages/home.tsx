@@ -7,7 +7,7 @@ import {
 } from '@material-ui/core'
 import React, { useEffect, useState } from 'react'
 import CardComponent from '../src/components/card.component'
-import withRedux, { filterByPriceEnum } from '../src/enhandcer/withRedux'
+import withRedux, { filterByPriceEnum, User } from '../src/enhandcer/withRedux'
 import { ResponseCategories, ResponseSearch } from '../src/interfaces/Responses'
 import HomeTemplate from '../src/template/home.template'
 import {
@@ -19,6 +19,7 @@ import {
 import { ItemProduct, Seller } from '../src/interfaces/ItemProduct'
 import Snackbar from '@material-ui/core/Snackbar'
 import { GraphQLClient } from 'graphql-request'
+import { SetUserProperties } from '../state/actions/user.actions'
 
 const HomePageStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -122,6 +123,7 @@ const HomePage = (props) => {
     lookupValue,
     searchBy,
     resultFromSearch,
+    userProperties,
   } = props
   const classes = HomePageStyles()
   const [openBackdrop, setOpenBackDrop] = useState(false)
@@ -190,6 +192,38 @@ const HomePage = (props) => {
     }
     handleFilterByStore(filterByStore)
   }, [filterByStore])
+  const handleFavoriteClick = async (_id: string, like: boolean) => {
+    console.log('Si entro', _id, like)
+
+    if (_id && like) {
+      if (like) {
+        const { user }: { user: User } = await fetch(
+          `${process.env.NEXT_PUBLIC_ADD_FAVORITE}`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email: userProperties.email, id: _id }),
+          },
+        ).then((res) => res.json())
+        dispatch(SetUserProperties({ ...user }))
+      } else {
+        const { user }: { user: User } = await fetch(
+          `${process.env.NEXT_PUBLIC_REMOVE_FAVORITE}`,
+          {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email: userProperties.email, id: _id }),
+          },
+        ).then((res) => res.json())
+        dispatch(SetUserProperties({ ...user }))
+      }
+    }
+  }
+
   return (
     <section className={classes['home-container']}>
       <Snackbar
@@ -211,6 +245,7 @@ const HomePage = (props) => {
             ? resultList.map(
                 (
                   {
+                    _id,
                     name,
                     category,
                     value,
@@ -221,6 +256,7 @@ const HomePage = (props) => {
                   index: number,
                 ) => (
                   <CardComponent
+                    id={_id}
                     key={index}
                     title={name}
                     price={value}
@@ -228,6 +264,7 @@ const HomePage = (props) => {
                     img={image}
                     category={category}
                     url={url}
+                    onHeartClick={handleFavoriteClick}
                   />
                 ),
               )
@@ -240,6 +277,7 @@ const HomePage = (props) => {
 
 export async function getServerSideProps({ query }) {
   const { searchBy = null } = query
+
   const gqlClient = new GraphQLClient(process.env.GRAPHQL_ENDPOINT)
   const {
     categoriesList,
@@ -251,6 +289,7 @@ export async function getServerSideProps({ query }) {
   } = await gqlClient.request(`query {
     initialResults {
       response {
+        _id
         name
         value
         seller {
@@ -269,6 +308,7 @@ export async function getServerSideProps({ query }) {
     categoriesList
     searchByProduct(name: "${searchBy}") {
       response {
+        _id
         name
         value
         seller {

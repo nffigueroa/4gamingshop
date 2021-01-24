@@ -2,13 +2,18 @@ import {
   Backdrop,
   Button,
   CircularProgress,
+  ClickAwayListener,
   createStyles,
+  Grow,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
   makeStyles,
   MenuItem,
+  MenuList,
+  Paper,
+  Popper,
   Select,
   SwipeableDrawer,
   TextField,
@@ -16,6 +21,10 @@ import {
   useMediaQuery,
   useTheme,
 } from '@material-ui/core'
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown'
+import AccountCircleIcon from '@material-ui/icons/AccountCircle'
+import HighlightOffOutlinedIcon from '@material-ui/icons/HighlightOffOutlined'
+import ClearIcon from '@material-ui/icons/Clear'
 import CloseIcon from '@material-ui/icons/Close'
 import { Router, useRouter } from 'next/router'
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos'
@@ -32,8 +41,13 @@ import {
 import {
   SetFilterByPrice,
   SetFilterByStore,
+  SetInitialResults,
+  SetSponsors,
 } from '../../state/actions/inventory.actions'
+
+import { RemoveTKN } from '../../state/actions/user.actions'
 import { Seller } from '../interfaces/ItemProduct'
+import UserMenu from './user-menu.component'
 const HeaderStyles = makeStyles((theme: Theme) =>
   createStyles({
     'container-header-com': {
@@ -63,6 +77,7 @@ const HeaderStyles = makeStyles((theme: Theme) =>
         height: '230px',
         borderBottomLeftRadius: '10px',
         borderBottomRightRadius: '10px',
+        overflow: 'unset',
       },
     },
     icon: {
@@ -92,9 +107,12 @@ const HeaderStyles = makeStyles((theme: Theme) =>
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-around',
+      zIndex: -1,
       [theme.breakpoints.up('md')]: {
-        width: '50%',
+        zIndex: 0,
+        width: '55%',
         margin: 'auto',
+        marginLeft: '0',
         display: 'flex',
         flexDirection: 'row',
       },
@@ -155,15 +173,19 @@ const HeaderStyles = makeStyles((theme: Theme) =>
     'container-right': {
       width: '300px',
       position: 'relative',
-      top: '-10px',
+      //top: '-10px',
       [theme.breakpoints.down('md')]: {
         display: 'none',
+      },
+      [theme.breakpoints.up('md')]: {
+        width: 'auto',
       },
     },
     'span-registrarse': {
       color: theme.palette.text.secondary,
       display: 'block',
       textAlign: 'center',
+      marginBottom: '10px',
     },
     buttons: {},
     backdrop: {
@@ -180,6 +202,20 @@ const HeaderStyles = makeStyles((theme: Theme) =>
         display: 'none',
       },
     },
+    welcome: {
+      fontFamily: 'OpenSans-Light',
+      color: theme.palette.text.secondary,
+      textAlign: 'center',
+    },
+    'menu-option': {
+      fontSize: '50px',
+      color: 'white',
+      position: 'fixed',
+      bottom: '100px',
+      right: '50px',
+      borderRadius: '50%',
+      backgroundColor: theme.palette.background.paper,
+    },
   }),
 )
 
@@ -190,7 +226,10 @@ const HeaderComponent = ({
   sponsors,
   filterByStore,
   filterByPrice,
+  userProperties,
+  tkn,
 }) => {
+  const [user, setUser] = useState(userProperties)
   const router = useRouter()
   const classes = HeaderStyles()
   const theme = useTheme()
@@ -199,6 +238,9 @@ const HeaderComponent = ({
   const [openBackdrop, setOpenBackDrop] = useState(false)
   const [inputValue, setInputValue] = useState('')
   const handleStore = (item: string) => dispatch(SetFilterByStore(item))
+  useEffect(() => {
+    setUser(userProperties)
+  }, [userProperties])
   const handlePriceSort = (item) => {
     setPriceFilter(item)
     dispatch(SetFilterByPrice(item))
@@ -311,11 +353,12 @@ const HeaderComponent = ({
       </section>
     </>
   )
+
   return (
     <section
       className={classes['container-header-com']}
       style={{
-        height: menuOpened && menuOpened.up ? '230px' : matches ? '80px' : 0,
+        height: menuOpened && menuOpened.up ? '300px' : matches ? '80px' : 0,
       }}
     >
       <span className={classes['container-left']} onClick={redirectToHome}>
@@ -328,6 +371,17 @@ const HeaderComponent = ({
         />
         <h1 className={classes['span-title']}>4GAMERSHOP</h1>
       </span>
+      {!matches ? (
+        <MemberOption
+          tkn={user && tkn ? tkn : null}
+          fName={user && user.firstName ? user.firstName : null}
+          lName={user && user.lastName ? user.lastName : null}
+          logOutFunc={() => dispatch(RemoveTKN())}
+        />
+      ) : (
+        ''
+      )}
+
       <section className={classes['container-mid']}>
         <TextField
           className={classes.input}
@@ -341,18 +395,19 @@ const HeaderComponent = ({
         />
         <FilterByPrice />
       </section>
-      <section className={classes['container-right']}>
-        <span className={classes['span-registrarse']}>
-          <p>¿Aún no eres miembro?</p>
-          <section className={classes.buttons}>
-            <Button variant="contained" color="primary">
-              Registrate
-            </Button>
-            <Button style={{ marginLeft: '10px' }} variant="contained">
-              Inicia Sesion
-            </Button>
-          </section>
-        </span>
+      <section
+        className={classes['container-right']}
+        style={{
+          top:
+            user && tkn && user.firstName && user.lastName ? '20px' : '-10px',
+        }}
+      >
+        <MemberOption
+          tkn={user && tkn ? tkn : null}
+          fName={user && user.firstName ? user.firstName : null}
+          lName={user && user.lastName ? user.lastName : null}
+          logOutFunc={() => dispatch(RemoveTKN())}
+        />
       </section>
       {menuOpened ? (
         <React.Fragment key={'left'}>
@@ -402,6 +457,42 @@ const HeaderComponent = ({
         ''
       )}
     </section>
+  )
+}
+
+export const MemberOption = ({ tkn, fName, lName, logOutFunc }) => {
+  const classes = HeaderStyles()
+  const theme = useTheme()
+  const router = useRouter()
+
+  return (
+    <>
+      {fName && lName && tkn ? (
+        <div className={classes.welcome}>
+          <UserMenu name={`${fName} ${lName}`} logOutFunc={logOutFunc} />
+        </div>
+      ) : (
+        <span className={classes['span-registrarse']}>
+          <p>¿Aún no eres miembro?</p>
+          <section className={classes.buttons}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => router.push({ pathname: '/register' })}
+            >
+              Registrate
+            </Button>
+            <Button
+              style={{ marginLeft: '10px' }}
+              variant="contained"
+              onClick={() => router.push({ pathname: '/login' })}
+            >
+              Inicia Sesion
+            </Button>
+          </section>
+        </span>
+      )}
+    </>
   )
 }
 

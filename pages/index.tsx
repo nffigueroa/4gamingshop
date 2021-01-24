@@ -256,6 +256,7 @@ export async function getServerSideProps({ query }) {
   } = await gqlClient.request(`query {
     initialResults {
       response {
+        _id
         name
         value
         seller {
@@ -274,6 +275,7 @@ export async function getServerSideProps({ query }) {
     categoriesList
     searchByProduct(name: "${searchBy}") {
       response {
+        _id
         name
         value
         seller {

@@ -18,9 +18,7 @@ a {
 
 @font-face {
   font-family: "OpenSans";
-  src: url("/fonts/OpenSansCondensed-Bold.ttf");
   src: url("/fonts/OpenSansCondensed-Light.ttf");
-  src: url("/fonts/OpenSansCondensed-LightItalic.ttf");
 }
 @font-face {
   font-family: "OpenSans-Light";

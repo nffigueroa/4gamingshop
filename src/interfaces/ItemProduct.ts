@@ -1,4 +1,5 @@
 export interface ItemProduct {
+  _id: string;
   name: string;
   value: string;
   seller: Seller;

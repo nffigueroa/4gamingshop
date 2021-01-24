@@ -6,9 +6,13 @@ import {
   TextField,
   Theme,
 } from '@material-ui/core'
+import { GraphQLClient } from 'graphql-request'
 import Head from 'next/head'
 import Image from 'next/image'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 import withRedux from '../src/enhandcer/withRedux'
+import { AddTKN, SetUserProperties } from '../state/actions/user.actions'
 const StylesLoginPage = makeStyles((theme: Theme) =>
   createStyles({
     'login-container': {
@@ -16,19 +20,34 @@ const StylesLoginPage = makeStyles((theme: Theme) =>
       width: '100vw',
       [theme.breakpoints.up('md')]: {
         backgroundImage: 'url("/img/bg-1538481199.jpg")',
+        width: 'auto',
+        display: 'flex',
       },
     },
     'box-login': {
       padding: '10px',
       backgroundColor: theme.palette.background.paper,
       height: '100%',
+      [theme.breakpoints.up('md')]: {
+        height: '690px',
+        width: '514px',
+        margin: 'auto',
+        marginRight: '50px',
+        borderRadius: '10px',
+        boxShadow:
+          'inset -1px 3px 8px 5px #1F87FF, 2px 5px 16px 0px #0B325E, inset 5px 5px 15px 5px rgba(0,0,0,0)',
+        padding: '30px',
+      },
     },
     'title-login': {
+      paddingTop: '40%',
+
       color: theme.palette.text.primary,
       fontFamily: 'OpenSans-Light',
     },
     'text-login': {
       width: '100%',
+      paddingBottom: '19px',
       '&::before': {
         content: '',
         backgroundColor: 'rgba(255, 255, 255, 0.12)',
@@ -101,11 +120,35 @@ const StylesLoginPage = makeStyles((theme: Theme) =>
       top: '-3px',
       fontFamily: 'OpenSans-Bold',
     },
+    'create-new-account-label': {
+      color: theme.palette.text.primary,
+      fontFamily: 'OpenSans-Light',
+    },
   }),
 )
 
-const LoginPage = () => {
+const LoginPage = ({ tknFresh, user, userProperties, dispatch, tkn }) => {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const classes = StylesLoginPage()
+  const router = useRouter()
+  console.log(userProperties)
+
+  const handleLoginClick = () => {
+    router.push({ pathname: '/login', query: { email, password } })
+  }
+  useEffect(() => {
+    if (userProperties && tkn) {
+      router.replace('/login', undefined, { shallow: true })
+      router.push('/home')
+    }
+  }, [userProperties])
+  useEffect(() => {
+    if (user) {
+      dispatch(SetUserProperties({ ...user }))
+      dispatch(AddTKN(tknFresh))
+    }
+  }, [user])
   return (
     <section className={classes['login-container']}>
       <Head>
@@ -115,24 +158,41 @@ const LoginPage = () => {
       <div className={classes['box-login']}>
         <Image src="/img/Logo4Gamer.png" alt="Logo" width={60} height={40} />
         <h1 className={classes['title-login']}>Inicia Sesion</h1>
+        <p className={classes['create-new-account-label']}>
+          Usuario nuevo?
+          <span
+            style={{ cursor: 'pointer', textDecoration: 'underline' }}
+            onClick={() => router.push('/register')}
+          >
+            Crea una cuenta
+          </span>
+        </p>
         <TextField
           className={classes['text-login']}
           id="standard-basic"
           label="Correo@example.com"
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <TextField
+          className={classes['text-login']}
+          id="standard-basic"
+          label="Password"
+          onChange={(e) => setPassword(e.target.value)}
         />
         <Button
           style={{ marginTop: '10px' }}
           variant="contained"
           color="primary"
+          onClick={() => handleLoginClick()}
         >
           Continuar
         </Button>
-        <section className={classes['wrap-or']}>
+        {/*<section className={classes['wrap-or']}>
           <div className={classes.divider} />
           <section className={classes['or-option']}>Ó</section>
           <div className={classes.divider} />
         </section>
-        <section className={classes['login-ops-container']}>
+       <section className={classes['login-ops-container']}>
           <button className={classes['google-button']}>
             <svg
               viewBox="0 0 1152 1152"
@@ -192,10 +252,26 @@ const LoginPage = () => {
               Continuar con Apple
             </span>
           </button>
-        </section>
+        </section>*/}
       </div>
     </section>
   )
+}
+
+export async function getServerSideProps({ query }) {
+  if (!query) {
+    return
+  }
+  const { email, password } = query
+  const { user, tkn }: any = await fetch(
+    `${process.env.LOGIN_ENDPOINT}?email=${email}&password=${password}`,
+  ).then((response) => response.json())
+  return {
+    props: {
+      user: user ?? null,
+      tknFresh: tkn ?? null,
+    },
+  }
 }
 
 export default withRedux(LoginPage)
