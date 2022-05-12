@@ -8,7 +8,6 @@ import {
 import React, { useEffect, useState } from 'react'
 import CardComponent from '../src/components/card.component'
 import withRedux, { filterByPriceEnum } from '../src/enhandcer/withRedux'
-import { ResponseCategories, ResponseSearch } from '../src/interfaces/Responses'
 import HomeTemplate from '../src/template/home.template'
 import {
   SetCagories,
@@ -259,7 +258,7 @@ export async function getServerSideProps({ query }) {
         }
         category
         image
-        urlRefer
+        url
       }
       sponsors {
         key
@@ -277,7 +276,7 @@ export async function getServerSideProps({ query }) {
         }
         category
         image
-        urlRefer
+        url
       }
     sponsors {
         key

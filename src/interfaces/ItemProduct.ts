@@ -3,6 +3,7 @@ export interface ItemProduct {
   value: string;
   seller: Seller;
   image?: string;
+  url?: string;
 }
 
 export interface Seller {

@@ -16,14 +16,7 @@ import {
   SetProductsByCategory,
   SetSponsors,
 } from '../state/actions/inventory.actions'
-import ContactSupportIcon from '@material-ui/icons/ContactSupport'
-import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward'
-import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward'
 import { GraphQLClient } from 'graphql-request'
-import useSWR from 'swr'
-import { Router, useRouter } from 'next/router'
-import { gql, useLazyQuery, useQuery } from '@apollo/client'
-import { SetPageLoading } from '../state/actions/navigtation.actions'
 
 const CategoryPageStyles = makeStyles((theme) =>
   createStyles({
@@ -137,7 +130,7 @@ const CategoryPage = ({
   }, [products])
   const handleFilterByStore = (storeClicked?: string) => {
     if (!storeClicked || storeClicked === 'todos') {
-      setResultsFiltered(productsByCategory.data)
+      setResultsFiltered(products.data)
       return
     }
     const newListFilteresByStore = resultsFiltered.filter(
@@ -246,7 +239,7 @@ export async function getServerSideProps({ query }) {
         }
         category
         image
-        urlRefer
+        url
       }
       sponsors {
         key

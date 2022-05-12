@@ -259,7 +259,7 @@ export async function getServerSideProps({ query }) {
         }
         category
         image
-        urlRefer
+        url
       }
       sponsors {
         key
@@ -277,7 +277,7 @@ export async function getServerSideProps({ query }) {
         }
         category
         image
-        urlRefer
+        url
       }
     sponsors {
         key
