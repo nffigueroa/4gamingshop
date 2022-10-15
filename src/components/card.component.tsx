@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Card,
   CardActions,
   CardContent,
@@ -11,35 +10,50 @@ import {
   makeStyles,
   Theme,
   Typography,
-  useMediaQuery,
-  useTheme,
-} from '@material-ui/core'
-import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder'
-import FavoriteIcon from '@material-ui/icons/Favorite'
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
-import ThumbUpAltIcon from '@material-ui/icons/ThumbUpAlt'
-import ThumbDownIcon from '@material-ui/icons/ThumbDown'
-import clsx from 'clsx'
-import React, { useEffect, useState } from 'react'
-import Image from 'next/image'
-import ShoppingCartIcon from '@material-ui/icons/ShoppingCart'
-import withRedux from '../enhandcer/withRedux'
+} from '@material-ui/core';
+import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
+import FavoriteIcon from '@material-ui/icons/Favorite';
+import clsx from 'clsx';
+import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
+import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
+import withRedux from '../enhandcer/withRedux';
 
 const CardComponentClasses = makeStyles((theme: Theme) =>
   createStyles({
+    vendor: {
+      fontSize: '14px',
+      color: '#00a650',
+      fontWeight: 'bold',
+      position: 'absolute',
+      bottom: '5px',
+    },
+    price: {
+      color: '#333',
+      fontSize: '24px',
+      marginTop: '20px',
+      textOverflow: 'ellipsis',
+      maxHeight: '188px',
+    },
     'container-card': {
       width: '100%',
       display: 'inline',
       position: 'relative',
+      cursor: 'pointer',
       [theme.breakpoints.up('sm')]: {
         width: '30%',
         marginRight: '10px',
       },
       [theme.breakpoints.up('md')]: {
-        width: '20%',
+        width: '220px',
+        marginLeft: '20px',
+        marginTop: '20px',
+        position: 'relative',
+        height: 'auto',
       },
     },
     title: {
+      color: '#666',
       fontSize: '14px',
       width: 'auto',
       height: '40px',
@@ -49,6 +63,9 @@ const CardComponentClasses = makeStyles((theme: Theme) =>
       [theme.breakpoints.up('md')]: {
         height: '55px',
         marginTop: '5px',
+        maxWidth: '170px',
+        textOverflow: 'ellipsis',
+        wordWrap: 'break-word',
       },
     },
     media: {
@@ -57,10 +74,11 @@ const CardComponentClasses = makeStyles((theme: Theme) =>
       borderRadius: '5px',
     },
     card: {
+      background: 'white',
       [theme.breakpoints.up('md')]: {
-        paddingBottom: '15px',
+        paddingBottom: '20px',
+        height: '100%',
       },
-      marginBottom: '20px',
     },
     expand: {
       transform: 'rotate(0deg)',
@@ -72,33 +90,8 @@ const CardComponentClasses = makeStyles((theme: Theme) =>
     expandOpen: {
       transform: 'rotate(180deg)',
     },
-  }),
-)
-
-const RedirectBottomStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    'container-redirect': {
-      textAlign: 'center',
-      cursor: 'pointer',
-      fontWeight: 'bold',
-    },
-  }),
-)
-
-const RedirectBottom = ({ url }) => {
-  const classes = RedirectBottomStyles()
-  return (
-    <section
-      className={classes['container-redirect']}
-      onClick={() => (url ? (window.location.href = url) : '')}
-    >
-      <Box bgcolor="success.main" color="primary.contrastText" p={1}>
-        <span>VER EN TIENDA</span>
-        <ShoppingCartIcon />
-      </Box>
-    </section>
-  )
-}
+  })
+);
 
 const CardComponent = ({
   title,
@@ -111,20 +104,21 @@ const CardComponent = ({
   userProperties,
   onHeartClick,
 }) => {
-  const classes = CardComponentClasses()
-  const [hover, setHover] = useState(false)
-  const theme = useTheme()
-  const matches = useMediaQuery(theme.breakpoints.up('md'))
+  const { [price.length - 1]: last } = price;
+  const { value } = last;
+  const classes = CardComponentClasses();
+
   const ShowHeart = () => {
-    const [has, setHas] = useState(false)
-    const { products } = userProperties
+    const [has, setHas] = useState(false);
+    const { products } = userProperties;
+
     const handleClick = (flag: boolean) => {
       // false = dislike , true = like
-      onHeartClick(id, flag)
-    }
+      onHeartClick(id, flag);
+    };
     useEffect(() => {
-      setHas(!!products.filter((item: string) => item === id)[0])
-    }, [])
+      setHas(!!products.filter((item: string) => item === id)[0]);
+    }, []);
     return (
       <>
         {has ? (
@@ -133,33 +127,35 @@ const CardComponent = ({
           <FavoriteBorderIcon onClick={() => handleClick(true)} />
         )}
       </>
-    )
-  }
+    );
+  };
   return (
-    <section className={classes['container-card']}>
+    <section
+      className={classes['container-card']}
+      onClick={() => {
+        const result = confirm('Sera redirigido a la web del vendedor.');
+        if (result) {
+          window.open(url, '_blank');
+        }
+      }}
+    >
       <Card className={classes.card}>
         <CardContent>
           {img ? (
-            <CardMedia className={classes.media} image={img} title="Item" />
+            <CardMedia className={classes.media} image={img} title='Item' />
           ) : (
             <Image
-              src="/img/not-found.png"
-              alt="Product Image"
+              src='/img/not-found.png'
+              alt='Product Image'
               width={284}
               height={160}
             />
           )}
-          <Typography
-            className={classes.title}
-            color="textSecondary"
-            gutterBottom
-          >
-            {title}
+
+          <Typography variant='h5' className={classes.price}>
+            $ {new Intl.NumberFormat().format(value)}
           </Typography>
 
-          <Typography variant="h5" component="h2">
-            $ {new Intl.NumberFormat().format(price)}
-          </Typography>
           <CardActions
             style={{ position: 'relative', height: '5px', marginTop: '-20px' }}
           >
@@ -167,54 +163,29 @@ const CardComponent = ({
               <IconButton
                 className={clsx(classes.expand, {})}
                 onClick={() => {}}
-                aria-label="Añadir a favoritos"
+                aria-label='Añadir a favoritos'
               >
                 <ShowHeart />
               </IconButton>
             ) : (
               ''
             )}
-
-            <IconButton
-              className={clsx(classes.expand, {
-                [classes.expandOpen]: hover,
-              })}
-              onClick={() => {
-                setHover(!hover)
-              }}
-              aria-expanded={hover}
-              aria-label="show more"
-              style={{ position: 'absolute', bottom: '-50px', left: '40%' }}
-            >
-              <ExpandMoreIcon />
-            </IconButton>
           </CardActions>
 
-          <Collapse
-            in={hover}
-            timeout="auto"
-            unmountOnExit
-            style={{ paddingTop: '20px' }}
+          <Typography
+            className={classes.title}
+            color='textSecondary'
+            gutterBottom
           >
-            <CardContent>
-              <Typography variant="body2" component="p">
-                Vendedor: {seller}
-              </Typography>
-              <Typography variant="body2" component="p">
-                Categoria: {category}
-              </Typography>
-            </CardContent>
-
-            {/* <CardActions style={{ position: 'absolute', bottom: '40px' }}>
-            <ShoppingCartIcon />
-          </CardActions>
-          */}
-            <RedirectBottom url={url} />
-          </Collapse>
+            {title}
+          </Typography>
+          <Typography component='span' className={classes.vendor}>
+            {seller}
+          </Typography>
         </CardContent>
       </Card>
     </section>
-  )
-}
+  );
+};
 
-export default withRedux(CardComponent)
+export default withRedux(CardComponent);

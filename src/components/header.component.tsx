@@ -20,38 +20,39 @@ import {
   Theme,
   useMediaQuery,
   useTheme,
-} from '@material-ui/core'
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown'
-import AccountCircleIcon from '@material-ui/icons/AccountCircle'
-import HighlightOffOutlinedIcon from '@material-ui/icons/HighlightOffOutlined'
-import ClearIcon from '@material-ui/icons/Clear'
-import CloseIcon from '@material-ui/icons/Close'
-import { Router, useRouter } from 'next/router'
-import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos'
-import React, { useEffect, useState } from 'react'
-import Image from 'next/image'
-import MenuIcon from '@material-ui/icons/Menu'
-import withRedux, { filterByPriceEnum } from '../enhandcer/withRedux'
+} from '@material-ui/core';
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import HighlightOffOutlinedIcon from '@material-ui/icons/HighlightOffOutlined';
+import ClearIcon from '@material-ui/icons/Clear';
+import CloseIcon from '@material-ui/icons/Close';
+import { Router, useRouter } from 'next/router';
+import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
+import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
+import MenuIcon from '@material-ui/icons/Menu';
+import withRedux, { filterByPriceEnum } from '../enhandcer/withRedux';
 import {
   AmendSearchBylookUpValue,
   SetCategorySelected,
   SetLookupValue,
   SetMenuOpened,
-} from '../../state/actions/navigtation.actions'
+} from '../../state/actions/navigtation.actions';
 import {
   SetFilterByPrice,
   SetFilterByStore,
   SetInitialResults,
   SetSponsors,
-} from '../../state/actions/inventory.actions'
+} from '../../state/actions/inventory.actions';
 
-import { RemoveTKN } from '../../state/actions/user.actions'
-import { Seller } from '../interfaces/ItemProduct'
-import UserMenu from './user-menu.component'
+import { RemoveTKN } from '../../state/actions/user.actions';
+import { Seller } from '../interfaces/ItemProduct';
+import UserMenu from './user-menu.component';
 const HeaderStyles = makeStyles((theme: Theme) =>
   createStyles({
     'container-header-com': {
-      backgroundColor: theme.palette.background.default,
+      background:
+        'linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(121,9,120,1) 100%, rgba(0,212,255,1) 100%)',
       height: '230px',
       width: '100%',
       display: 'flex',
@@ -216,8 +217,8 @@ const HeaderStyles = makeStyles((theme: Theme) =>
       borderRadius: '50%',
       backgroundColor: theme.palette.background.paper,
     },
-  }),
-)
+  })
+);
 
 const HeaderComponent = ({
   listCategories,
@@ -229,86 +230,86 @@ const HeaderComponent = ({
   userProperties,
   tkn,
 }) => {
-  const [user, setUser] = useState(userProperties)
-  const router = useRouter()
-  const classes = HeaderStyles()
-  const theme = useTheme()
-  const [priceFilter, setPriceFilter] = useState(filterByPriceEnum.DOWN)
-  const matches = useMediaQuery(theme.breakpoints.up('md'))
-  const [openBackdrop, setOpenBackDrop] = useState(false)
-  const [inputValue, setInputValue] = useState('')
-  const handleStore = (item: string) => dispatch(SetFilterByStore(item))
+  const [user, setUser] = useState(userProperties);
+  const router = useRouter();
+  const classes = HeaderStyles();
+  const theme = useTheme();
+  const [priceFilter, setPriceFilter] = useState(filterByPriceEnum.DOWN);
+  const matches = useMediaQuery(theme.breakpoints.up('md'));
+  const [openBackdrop, setOpenBackDrop] = useState(false);
+  const [inputValue, setInputValue] = useState('');
+  const handleStore = (item: string) => dispatch(SetFilterByStore(item));
   useEffect(() => {
-    setUser(userProperties)
-  }, [userProperties])
+    setUser(userProperties);
+  }, [userProperties]);
   const handlePriceSort = (item) => {
-    setPriceFilter(item)
-    dispatch(SetFilterByPrice(item))
-  }
+    setPriceFilter(item);
+    dispatch(SetFilterByPrice(item));
+  };
   const toggleDrawer = (anchor, open) => (event) => {
     if (
       event &&
       event.type === 'keydown' &&
       (event.key === 'Tab' || event.key === 'Shift')
     ) {
-      return
+      return;
     }
-    dispatch(SetMenuOpened({ ...menuOpened, [anchor]: open }))
-  }
+    dispatch(SetMenuOpened({ ...menuOpened, [anchor]: open }));
+  };
   const hanldeEnter = ({ key }) => {
     if (key === 'Enter' && (router.route === '/' || router.route === '/home')) {
-      Router.events.on('routeChangeStart', () => setOpenBackDrop(true))
-      Router.events.on('routeChangeComplete', () => setOpenBackDrop(false))
+      Router.events.on('routeChangeStart', () => setOpenBackDrop(true));
+      Router.events.on('routeChangeComplete', () => setOpenBackDrop(false));
       router.push({
         pathname: '/home',
         query: {
           searchBy: inputValue,
         },
-      })
-      return
+      });
+      return;
     }
     if (key === 'Enter') {
-      dispatch(AmendSearchBylookUpValue(inputValue))
-      setPriceFilter(filterByPriceEnum.DOWN)
-      handleStore('todos')
+      dispatch(AmendSearchBylookUpValue(inputValue));
+      setPriceFilter(filterByPriceEnum.DOWN);
+      handleStore('todos');
     }
-  }
+  };
   useEffect(() => {
-    setPriceFilter(filterByPriceEnum.DOWN)
-    handleStore('todos')
-    dispatch(AmendSearchBylookUpValue(''))
-  }, [])
+    setPriceFilter(filterByPriceEnum.DOWN);
+    handleStore('todos');
+    dispatch(AmendSearchBylookUpValue(''));
+  }, []);
   const redirectToHome = () => {
-    Router.events.on('routeChangeStart', () => setOpenBackDrop(true))
-    Router.events.on('routeChangeComplete', () => setOpenBackDrop(false))
-    router.push('/')
-  }
+    Router.events.on('routeChangeStart', () => setOpenBackDrop(true));
+    Router.events.on('routeChangeComplete', () => setOpenBackDrop(false));
+    router.push('/');
+  };
   const handleCategorySelected = (category: string) => {
-    dispatch(SetCategorySelected(category))
+    dispatch(SetCategorySelected(category));
 
-    dispatch(SetMenuOpened({ left: !menuOpened.left }))
-    Router.events.on('routeChangeStart', () => setOpenBackDrop(true))
-    Router.events.on('routeChangeComplete', () => setOpenBackDrop(false))
-    router.push({ pathname: '/category', query: { filterby: category } })
-  }
+    dispatch(SetMenuOpened({ left: !menuOpened.left }));
+    Router.events.on('routeChangeStart', () => setOpenBackDrop(true));
+    Router.events.on('routeChangeComplete', () => setOpenBackDrop(false));
+    router.push({ pathname: '/category', query: { filterby: category } });
+  };
   useEffect(() => {
-    dispatch(SetMenuOpened({ left: false }))
-  }, [])
+    dispatch(SetMenuOpened({ left: false }));
+  }, []);
   const FilterByPrice = () => (
     <>
       <Backdrop className={classes.backdrop} open={openBackdrop}>
-        <CircularProgress color="inherit" />
+        <CircularProgress color='inherit' />
       </Backdrop>
       <section className={classes.filter}>
         <section className={classes['filter-icons']}>
           <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
+            labelId='demo-simple-select-label'
+            id='demo-simple-select'
             value={priceFilter}
             onChange={({ target: { value } }) => handlePriceSort(value)}
             className={classes.select}
           >
-            <MenuItem disabled value="">
+            <MenuItem disabled value=''>
               <em>Ver:</em>
             </MenuItem>
             <MenuItem value={filterByPriceEnum.DOWN}>
@@ -323,15 +324,15 @@ const HeaderComponent = ({
         {sponsors ? (
           <section className={classes['container-store']}>
             <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
+              labelId='demo-simple-select-label'
+              id='demo-simple-select'
               value={filterByStore ? filterByStore : 'todos'}
               onChange={({ target: { value } }) =>
                 handleStore(value.toString())
               }
               className={classes.select}
             >
-              <MenuItem disabled value="">
+              <MenuItem disabled value=''>
                 <em>Tiendas</em>
               </MenuItem>
 
@@ -352,7 +353,7 @@ const HeaderComponent = ({
         </span>
       </section>
     </>
-  )
+  );
 
   return (
     <section
@@ -363,8 +364,8 @@ const HeaderComponent = ({
     >
       <span className={classes['container-left']} onClick={redirectToHome}>
         <Image
-          src="/img/Logo4Gamer.png"
-          alt="Logo"
+          src='/img/Logo4Gamer.png'
+          alt='Logo'
           width={60}
           height={30}
           className={classes.img}
@@ -385,11 +386,11 @@ const HeaderComponent = ({
       <section className={classes['container-mid']}>
         <TextField
           className={classes.input}
-          id="lookup-field"
-          label="Serie o nombre del producto"
-          variant="outlined"
+          id='lookup-field'
+          label='Serie o nombre del producto'
+          variant='outlined'
           onChange={({ target: { value } }) => {
-            setInputValue(value)
+            setInputValue(value);
           }}
           onKeyPress={(e) => hanldeEnter(e)}
         />
@@ -450,20 +451,20 @@ const HeaderComponent = ({
         <CloseIcon
           onClick={() => dispatch(SetMenuOpened({ ...menuOpened, up: false }))}
           className={classes['icon']}
-          fontSize="small"
+          fontSize='small'
           style={{ fontSize: '30px', color: 'white' }}
         />
       ) : (
         ''
       )}
     </section>
-  )
-}
+  );
+};
 
 export const MemberOption = ({ tkn, fName, lName, logOutFunc }) => {
-  const classes = HeaderStyles()
-  const theme = useTheme()
-  const router = useRouter()
+  const classes = HeaderStyles();
+  const theme = useTheme();
+  const router = useRouter();
 
   return (
     <>
@@ -476,15 +477,15 @@ export const MemberOption = ({ tkn, fName, lName, logOutFunc }) => {
           <p>¿Aún no eres miembro?</p>
           <section className={classes.buttons}>
             <Button
-              variant="contained"
-              color="primary"
+              variant='contained'
+              color='primary'
               onClick={() => router.push({ pathname: '/register' })}
             >
               Registrate
             </Button>
             <Button
               style={{ marginLeft: '10px' }}
-              variant="contained"
+              variant='contained'
               onClick={() => router.push({ pathname: '/login' })}
             >
               Inicia Sesion
@@ -493,7 +494,7 @@ export const MemberOption = ({ tkn, fName, lName, logOutFunc }) => {
         </span>
       )}
     </>
-  )
-}
+  );
+};
 
-export default withRedux(HeaderComponent)
+export default withRedux(HeaderComponent);

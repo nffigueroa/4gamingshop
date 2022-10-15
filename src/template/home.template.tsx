@@ -6,24 +6,46 @@ import {
   Theme,
   useMediaQuery,
   useTheme,
-} from '@material-ui/core'
-import { Router, useRouter } from 'next/router'
-import React, { useEffect, useState } from 'react'
+} from '@material-ui/core';
+import { Router, useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
 import {
   SetCategorySelected,
   SetPageLoading,
-} from '../../state/actions/navigtation.actions'
-import HeaderComponent from '../components/header.component'
-import { MenuComponent, MenuItem } from '../components/menu.component'
-import withRedux from '../enhandcer/withRedux'
+} from '../../state/actions/navigtation.actions';
+import HeaderComponent from '../components/header.component';
+import { MenuComponent, MenuItem } from '../components/menu.component';
+import withRedux from '../enhandcer/withRedux';
 
 const HomeTemplateClasses = makeStyles((theme: Theme) =>
   createStyles({
+    '@global': {
+      body: {
+        background: '#ebebeb',
+      },
+    },
+    'cards-container': {
+      marginTop: '30px',
+      display: 'flex',
+      flexWrap: 'wrap',
+      width: '80%',
+      justifyContent: 'space-around',
+      margin: '30px auto auto auto',
+      [theme.breakpoints.up('md')]: {
+        marginTop: '30px',
+        display: 'flex',
+        flexWrap: 'wrap',
+        width: '100%',
+        justifyContent: 'flex-start',
+        marginLeft: '50px',
+      },
+    },
     'home-template-container': {
       width: '100%',
+
       [theme.breakpoints.up('md')]: {
         width: '90%',
-        backgroundColor: '#303030',
+        background: '#ebebeb',
         margin: '115px auto auto auto',
         borderRadius: '10px',
       },
@@ -47,42 +69,42 @@ const HomeTemplateClasses = makeStyles((theme: Theme) =>
       zIndex: theme.zIndex.drawer + 1,
       color: '#fff',
     },
-  }),
-)
+  })
+);
 
 const HomeTemplate = (props) => {
-  const { children, listCategories, dispatch, pageLoading = false } = props
-  const theme = useTheme()
-  const [openBackdrop, setOpenBackDrop] = useState(false)
-  const matches = useMediaQuery(theme.breakpoints.up('md'))
-  const [listMenu, setListMenu] = useState([])
-  const router = useRouter()
+  const { children, listCategories, dispatch, pageLoading = false } = props;
+  const theme = useTheme();
+  const [openBackdrop, setOpenBackDrop] = useState(false);
+  const matches = useMediaQuery(theme.breakpoints.up('md'));
+  const [listMenu, setListMenu] = useState([]);
+  const router = useRouter();
   useEffect(() => {
     if (!listCategories) {
-      return
+      return;
     }
     setListMenu(
       listCategories.map((item: string) => {
         return {
           txt: item,
           func: () => {
-            dispatch(SetCategorySelected(item))
-            Router.events.on('routeChangeStart', () => setOpenBackDrop(true))
+            dispatch(SetCategorySelected(item));
+            Router.events.on('routeChangeStart', () => setOpenBackDrop(true));
             Router.events.on('routeChangeComplete', () =>
-              setOpenBackDrop(false),
-            )
+              setOpenBackDrop(false)
+            );
 
-            router.push({ pathname: '/category', query: { filterby: item } })
+            router.push({ pathname: '/category', query: { filterby: item } });
           },
-        }
-      }),
-    )
-  }, [listCategories])
-  const classes = HomeTemplateClasses()
+        };
+      })
+    );
+  }, [listCategories]);
+  const classes = HomeTemplateClasses();
   return (
     <section className={classes['home-template-container']}>
       <Backdrop className={classes.backdrop} open={openBackdrop}>
-        <CircularProgress color="inherit" />
+        <CircularProgress color='inherit' />
       </Backdrop>
       <header className={classes['header-tmp']}>
         <HeaderComponent />
@@ -99,7 +121,7 @@ const HomeTemplate = (props) => {
         <section className={classes.child}>{children}</section>
       </section>
     </section>
-  )
-}
+  );
+};
 
-export default withRedux(HomeTemplate)
+export default withRedux(HomeTemplate);

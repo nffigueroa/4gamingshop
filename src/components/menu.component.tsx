@@ -1,52 +1,44 @@
-import {
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  ListSubheader,
-  makeStyles,
-} from '@material-ui/core'
-import LabelIcon from '@material-ui/icons/Label'
+import { List, ListItem, ListSubheader, makeStyles } from '@material-ui/core';
 
 const MenuStyles = makeStyles((theme) => ({
-  root: {
-    width: '100%',
-    maxWidth: 360,
-    backgroundColor: theme.palette.background.paper,
+  title: {
+    color: '#333',
+    fontSize: '16px',
   },
-  nested: {
-    paddingLeft: theme.spacing(4),
+  label: {
+    fontSize: '14px',
+    color: '#666',
   },
-}))
+}));
 
 export interface MenuItem {
-  func: Function
-  txt: string
+  func: Function;
+  txt: string;
 }
 
 export const MenuComponent = ({ list }) => {
-  const classes = MenuStyles()
+  const classes = MenuStyles();
   return (
     <>
       <List
-        component="nav"
-        aria-labelledby="nested-list-subheader"
+        component='nav'
+        aria-labelledby='nested-list-subheader'
         subheader={
-          <ListSubheader component="div" id="nested-list-subheader">
+          <ListSubheader
+            className={classes.title}
+            component='div'
+            id='nested-list-subheader'
+          >
             Categorias
           </ListSubheader>
         }
-        className={classes.root}
       >
         {list.map((item: MenuItem) => (
           <ListItem button onClick={() => item.func()}>
-            <ListItemIcon>
-              <LabelIcon />
-            </ListItemIcon>
-            <ListItemText secondary={item.txt} />
+            <span className={classes.label}>{item.txt} </span>
           </ListItem>
         ))}
       </List>
     </>
-  )
-}
+  );
+};
