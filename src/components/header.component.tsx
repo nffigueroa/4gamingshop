@@ -261,7 +261,7 @@ const HeaderComponent = ({
       Router.events.on('routeChangeStart', () => setOpenBackDrop(true));
       Router.events.on('routeChangeComplete', () => setOpenBackDrop(false));
       router.push({
-        pathname: '/home',
+        pathname: '/',
         query: {
           searchBy: inputValue,
         },

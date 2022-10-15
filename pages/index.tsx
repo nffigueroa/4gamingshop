@@ -140,7 +140,7 @@ const HomePage = (props) => {
   };
 
   useEffect(() => {
-    if (!resultFromSearch || !resultFromSearch.response.length) {
+    if (!resultFromSearch || !resultFromSearch.response?.length) {
       dispatch(SetSearchResult(initResults));
       return;
     }
@@ -204,6 +204,8 @@ const HomePage = (props) => {
 
 export async function getServerSideProps({ query }) {
   const { searchBy = null } = query;
+  console.log('Query gotten', searchBy);
+
   console.log('Fetching Initial results');
 
   const gqlClient = new GraphQLClient(process.env.GRAPHQL_ENDPOINT);
