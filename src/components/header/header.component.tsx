@@ -2,24 +2,19 @@ import {
   Backdrop,
   Button,
   CircularProgress,
-  ClickAwayListener,
   createStyles,
-  Grow,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
   makeStyles,
   MenuItem,
-  MenuList,
-  Paper,
-  Popper,
-  Select,
   SwipeableDrawer,
   TextField,
   Theme,
   useMediaQuery,
   useTheme,
+  Select,
 } from '@material-ui/core';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
@@ -31,23 +26,23 @@ import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import MenuIcon from '@material-ui/icons/Menu';
-import withRedux, { filterByPriceEnum } from '../enhandcer/withRedux';
+import withRedux, { filterByPriceEnum } from '../../enhandcer/withRedux';
 import {
   AmendSearchBylookUpValue,
   SetCategorySelected,
   SetLookupValue,
   SetMenuOpened,
-} from '../../state/actions/navigtation.actions';
+} from '../../../state/actions/navigtation.actions';
 import {
   SetFilterByPrice,
   SetFilterByStore,
   SetInitialResults,
   SetSponsors,
-} from '../../state/actions/inventory.actions';
+} from '../../../state/actions/inventory.actions';
 
-import { RemoveTKN } from '../../state/actions/user.actions';
-import { Seller } from '../interfaces/ItemProduct';
-import UserMenu from './user-menu.component';
+import { RemoveTKN } from '../../../state/actions/user.actions';
+import { Seller } from '../../interfaces/ItemProduct';
+import { MemberOption } from './member-option.component';
 const HeaderStyles = makeStyles((theme: Theme) =>
   createStyles({
     'container-header-com': {
@@ -182,12 +177,6 @@ const HeaderStyles = makeStyles((theme: Theme) =>
         width: 'auto',
       },
     },
-    'span-registrarse': {
-      color: theme.palette.text.secondary,
-      display: 'block',
-      textAlign: 'center',
-      marginBottom: '10px',
-    },
     buttons: {},
     backdrop: {
       zIndex: theme.zIndex.drawer + 1,
@@ -202,11 +191,6 @@ const HeaderStyles = makeStyles((theme: Theme) =>
       [theme.breakpoints.up('md')]: {
         display: 'none',
       },
-    },
-    welcome: {
-      fontFamily: 'OpenSans-Light',
-      color: theme.palette.text.secondary,
-      textAlign: 'center',
     },
     'menu-option': {
       fontSize: '50px',
@@ -246,6 +230,9 @@ const HeaderComponent = ({
     setPriceFilter(item);
     dispatch(SetFilterByPrice(item));
   };
+  useEffect(() => {
+    handlePriceSort(priceFilter);
+  }, []);
   const toggleDrawer = (anchor, open) => (event) => {
     if (
       event &&
@@ -256,7 +243,14 @@ const HeaderComponent = ({
     }
     dispatch(SetMenuOpened({ ...menuOpened, [anchor]: open }));
   };
-  const hanldeEnter = ({ key }) => {
+  const handleEnter = ({ key }) => {
+    console.log(key);
+
+    if (key === 'Enter') {
+      dispatch(AmendSearchBylookUpValue(inputValue));
+      setPriceFilter(filterByPriceEnum.DOWN);
+      handleStore('todos');
+    }
     if (key === 'Enter' && (router.route === '/' || router.route === '/home')) {
       Router.events.on('routeChangeStart', () => setOpenBackDrop(true));
       Router.events.on('routeChangeComplete', () => setOpenBackDrop(false));
@@ -267,11 +261,6 @@ const HeaderComponent = ({
         },
       });
       return;
-    }
-    if (key === 'Enter') {
-      dispatch(AmendSearchBylookUpValue(inputValue));
-      setPriceFilter(filterByPriceEnum.DOWN);
-      handleStore('todos');
     }
   };
   useEffect(() => {
@@ -390,9 +379,9 @@ const HeaderComponent = ({
           label='Serie o nombre del producto'
           variant='outlined'
           onChange={({ target: { value } }) => {
-            setInputValue(value);
+            setInputValue(value.toUpperCase());
           }}
-          onKeyPress={(e) => hanldeEnter(e)}
+          onKeyPress={(e) => handleEnter(e)}
         />
         <FilterByPrice />
       </section>
@@ -458,42 +447,6 @@ const HeaderComponent = ({
         ''
       )}
     </section>
-  );
-};
-
-export const MemberOption = ({ tkn, fName, lName, logOutFunc }) => {
-  const classes = HeaderStyles();
-  const theme = useTheme();
-  const router = useRouter();
-
-  return (
-    <>
-      {fName && lName && tkn ? (
-        <div className={classes.welcome}>
-          <UserMenu name={`${fName} ${lName}`} logOutFunc={logOutFunc} />
-        </div>
-      ) : (
-        <span className={classes['span-registrarse']}>
-          <p>¿Aún no eres miembro?</p>
-          <section className={classes.buttons}>
-            <Button
-              variant='contained'
-              color='primary'
-              onClick={() => router.push({ pathname: '/register' })}
-            >
-              Registrate
-            </Button>
-            <Button
-              style={{ marginLeft: '10px' }}
-              variant='contained'
-              onClick={() => router.push({ pathname: '/login' })}
-            >
-              Inicia Sesion
-            </Button>
-          </section>
-        </span>
-      )}
-    </>
   );
 };
 

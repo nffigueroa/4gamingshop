@@ -6,7 +6,7 @@ import {
   Theme,
 } from '@material-ui/core';
 import Head from 'next/head';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import withRedux, { filterByPriceEnum } from '../src/enhandcer/withRedux';
 
 import HomeTemplate from '../src/template/home.template';
@@ -20,6 +20,7 @@ import { ItemProduct } from '../src/interfaces/ItemProduct';
 import Snackbar from '@material-ui/core/Snackbar';
 import { GraphQLClient } from 'graphql-request';
 import { CardContainerComponent } from '../src/components/card-container.component';
+import { filterProductSearch } from '../src/hooks/use-filter-price.hook';
 
 const HomePageStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -111,32 +112,26 @@ const HomePage = (props) => {
   } = props;
   const classes = HomePageStyles();
   const [openBackdrop, setOpenBackDrop] = useState(false);
-  const [resultList, setResultList] = useState([]);
-  const [priceFilter, setPriceFilter] = useState(filterByPriceEnum.DOWN);
+  const [priceFilter, setPriceFilter] = useState(filterByPriceEnum.UP);
   const [snackBAr, setSnackBAr] = useState({ show: false, msg: '' });
+  const listMemo = useMemo(() => {
+    console.log(searchBy, resultFromSearch);
+
+    return filterProductSearch(
+      filterByPrice,
+      searchBy && resultFromSearch?.response.length
+        ? resultFromSearch.response
+        : initResults.response,
+      filterByStore,
+      searchBy
+    );
+  }, [filterByPrice, initResults, searchBy, filterByStore, resultFromSearch]);
+
   const handleClose = () => {
     setOpenBackDrop(false);
   };
   const handleCloseSnackbar = () => {
     setSnackBAr({ show: false, msg: '' });
-  };
-  const sortByPrice = (arr: Array<ItemProduct>) => {
-    const sortedList = arr.sort((a: ItemProduct, b: ItemProduct) =>
-      priceFilter === filterByPriceEnum.UP
-        ? Number(a.value) - Number(b.value)
-        : Number(b.value) - Number(a.value)
-    );
-    setResultList(sortedList);
-  };
-  const handleFilterByStore = (storeClicked: string) => {
-    if (!storeClicked || storeClicked === 'todos') {
-      setResultList(inventory.response);
-      return;
-    }
-    const newListFilteresByStore = inventory.response.filter(
-      (item: ItemProduct) => item.seller.key === storeClicked
-    );
-    setResultList(newListFilteresByStore);
   };
 
   useEffect(() => {
@@ -148,12 +143,6 @@ const HomePage = (props) => {
     dispatch(SetSponsors(resultFromSearch.sponsors));
   }, [resultFromSearch]);
 
-  useEffect(() => {
-    if (!inventory) {
-      return;
-    }
-    sortByPrice(inventory?.response);
-  }, [inventory?.response]);
   useEffect(() => {
     dispatch(SetSponsors(initResults.sponsors));
     dispatch(SetInitialResults(initResults));
@@ -168,14 +157,8 @@ const HomePage = (props) => {
 
   useEffect(() => {
     setPriceFilter(filterByPrice);
-    sortByPrice(resultList);
   }, [filterByPrice]);
-  useEffect(() => {
-    if (!inventory) {
-      return;
-    }
-    handleFilterByStore(filterByStore);
-  }, [filterByStore]);
+
   return (
     <section className={classes['home-container']}>
       <Head>
@@ -196,7 +179,9 @@ const HomePage = (props) => {
         <CircularProgress color='inherit' />
       </Backdrop>
       <HomeTemplate>
-        <CardContainerComponent resultList={resultList} />
+        {listMemo && listMemo.length && (
+          <CardContainerComponent resultList={listMemo} />
+        )}
       </HomeTemplate>
     </section>
   );
@@ -266,6 +251,7 @@ export async function getServerSideProps({ query }) {
     props: {
       categoriesDB: categoriesList,
       initResults: { response, sponsors },
+      searchBy,
       resultFromSearch: {
         response: resultsFromSearchResponse,
         sponsors: resultsFromSearchsponsors,

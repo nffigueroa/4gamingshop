@@ -1,5 +1,6 @@
 import { makeStyles, Theme, createStyles } from '@material-ui/core';
-import React from 'react';
+import React, { memo } from 'react';
+import { ItemProduct } from '../interfaces/ItemProduct';
 import CardComponent from './card.component';
 
 const CardContainerClasses = makeStyles((theme: Theme) =>
@@ -23,35 +24,29 @@ const CardContainerClasses = makeStyles((theme: Theme) =>
   })
 );
 
-export const CardContainerComponent = ({ resultList }) => {
+export const CardContainerComponent = (props: {
+  resultList: ItemProduct[];
+}) => {
+  const { resultList } = props;
+  console.log(resultList);
   const classes = CardContainerClasses();
   return (
     <section className={classes['cards-container']}>
-      {resultList && resultList.length
-        ? resultList.map(
-            (
-              {
-                name,
-                category,
-                value,
-                seller: { name: sellerName },
-                image,
-                url,
-              },
-              index: number
-            ) => (
-              <CardComponent
-                key={index}
-                title={name}
-                price={value}
-                seller={sellerName}
-                img={image}
-                category={category}
-                url={url}
-              />
-            )
-          )
-        : ''}
+      {resultList.map(
+        (
+          { name, value, seller: { name: sellerName }, image, url },
+          index: number
+        ) => (
+          <CardComponent
+            key={index}
+            title={name}
+            price={value}
+            seller={sellerName}
+            img={image}
+            url={url}
+          />
+        )
+      )}
     </section>
   );
 };

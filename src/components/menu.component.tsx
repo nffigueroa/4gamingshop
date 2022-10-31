@@ -1,4 +1,10 @@
-import { List, ListItem, ListSubheader, makeStyles } from '@material-ui/core';
+import {
+  List,
+  ListItem,
+  ListSubheader,
+  makeStyles,
+  styled,
+} from '@material-ui/core';
 
 const MenuStyles = makeStyles((theme) => ({
   title: {
@@ -8,6 +14,12 @@ const MenuStyles = makeStyles((theme) => ({
   label: {
     fontSize: '14px',
     color: '#666',
+  },
+}));
+
+const ListItemStyled = styled(ListItem)(() => ({
+  '&:hover': {
+    textDecoration: 'underline',
   },
 }));
 
@@ -34,9 +46,9 @@ export const MenuComponent = ({ list }) => {
         }
       >
         {list.map((item: MenuItem) => (
-          <ListItem button onClick={() => item.func()}>
+          <ListItemStyled button onClick={() => item.func()}>
             <span className={classes.label}>{item.txt} </span>
-          </ListItem>
+          </ListItemStyled>
         ))}
       </List>
     </>

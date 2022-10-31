@@ -1,50 +1,50 @@
-import React from 'react'
-import { connect } from 'react-redux'
-import { ItemProduct, Seller } from '../interfaces/ItemProduct'
-import { ResponseCategories, ResponseSearch } from '../interfaces/Responses'
+import React from 'react';
+import { connect } from 'react-redux';
+import { ItemProduct, Seller } from '../interfaces/ItemProduct';
+import { ResponseCategories, ResponseSearch } from '../interfaces/Responses';
 export enum filterByPriceEnum {
-  UP,
-  DOWN,
+  UP = 'up',
+  DOWN = 'down',
 }
 export interface User {
-  firstName: string
-  lastName: string
-  email: string
-  password?: string
-  sendNotifications: boolean
-  products: Array<string>
+  firstName: string;
+  lastName: string;
+  email: string;
+  password?: string;
+  sendNotifications: boolean;
+  products: Array<string>;
 }
 
 export interface StateInterface {
   inventory: {
-    searchResult: ResponseSearch
-    initialResults: ResponseSearch
-    listCategories: ResponseCategories
-    productsByCategory: any
-    filterByPrice: filterByPriceEnum
-    filterByStore: string
-    sponsors: Array<Seller>
-  }
+    searchResult: ResponseSearch;
+    initialResults: ResponseSearch;
+    listCategories: ResponseCategories;
+    productsByCategory: any;
+    filterByPrice: filterByPriceEnum;
+    filterByStore: string;
+    sponsors: Array<Seller>;
+  };
   navigation: {
-    categorySelected: string
+    categorySelected: string;
     menuOpened: {
-      left: boolean
-    }
-    page_loading: boolean
-    lookupValue: string
-    searchBy: string
-  }
+      left: boolean;
+    };
+    page_loading: boolean;
+    lookupValue: string;
+    searchBy: string;
+  };
   user: {
-    userProperties: User
-    tkn: string,
-    userProducts: Array<ItemProduct>
-  }
+    userProperties: User;
+    tkn: string;
+    userProducts: Array<ItemProduct>;
+  };
 }
 
 const withRedux = (Component: Function) => {
   const WithRedux = (props) => {
-    return <Component {...props} />
-  }
+    return <Component {...props} />;
+  };
   const mapStateToProps = (state: StateInterface) => ({
     inventory: state.inventory.searchResult,
     initialResults: state.inventory.initialResults,
@@ -60,9 +60,9 @@ const withRedux = (Component: Function) => {
     searchBy: state.navigation.searchBy,
     userProperties: state.user.userProperties,
     tkn: state.user.tkn,
-    userProducts: state.user.userProducts
-  })
-  return connect(mapStateToProps)(WithRedux)
-}
+    userProducts: state.user.userProducts,
+  });
+  return connect(mapStateToProps)(WithRedux);
+};
 
-export default withRedux
+export default withRedux;

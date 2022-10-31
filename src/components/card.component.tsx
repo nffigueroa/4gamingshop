@@ -4,7 +4,6 @@ import {
   CardActions,
   CardContent,
   CardMedia,
-  Collapse,
   createStyles,
   IconButton,
   makeStyles,
@@ -14,9 +13,8 @@ import {
 import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import clsx from 'clsx';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, memo } from 'react';
 import Image from 'next/image';
-import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import withRedux from '../enhandcer/withRedux';
 
 const CardComponentClasses = makeStyles((theme: Theme) =>
@@ -188,4 +186,4 @@ const CardComponent = ({
   );
 };
 
-export default withRedux(CardComponent);
+export default memo(withRedux(CardComponent));

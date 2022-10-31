@@ -9,11 +9,9 @@ import {
 } from '@material-ui/core';
 import { Router, useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import {
-  SetCategorySelected,
-  SetPageLoading,
-} from '../../state/actions/navigtation.actions';
-import HeaderComponent from '../components/header.component';
+import { SetCategorySelected } from '../../state/actions/navigtation.actions';
+import HeaderComponent from '../components/header/header.component';
+
 import { MenuComponent, MenuItem } from '../components/menu.component';
 import withRedux from '../enhandcer/withRedux';
 
